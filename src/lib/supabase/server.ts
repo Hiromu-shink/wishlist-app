@@ -12,16 +12,14 @@ function assertEnv() {
 }
 
 // RSC/ページ用（読み取りのみ・書き込みはNO-OP）
-export function createSupabaseRSCClient() {
-  const cookieStore = cookies();
+export async function createSupabaseRSCClient() {
+  const cookieStore = await cookies();
   const { supabaseUrl, supabaseAnonKey } = assertEnv();
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
         try {
-          // Optional in some runtimes; return undefined if unavailable
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return (cookieStore as any)?.get?.(name)?.value;
+          return cookieStore.get(name)?.value;
         } catch {
           return undefined;
         }
@@ -33,8 +31,8 @@ export function createSupabaseRSCClient() {
 }
 
 // サーバーアクション/Route Handler用（書き込み可能）
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
   const { supabaseUrl, supabaseAnonKey } = assertEnv();
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {

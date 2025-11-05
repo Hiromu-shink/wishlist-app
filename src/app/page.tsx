@@ -23,7 +23,7 @@ export default async function Home({ searchParams }: Props) {
   const month = searchParams.month || currentMonth();
   const sort = searchParams.sort || "created";
 
-  const supabase = createSupabaseRSCClient();
+  const supabase = await createSupabaseRSCClient();
   let items: WishlistItem[] = [];
   {
     let query = supabase.from("wishlist").select("*").eq("month", month);
