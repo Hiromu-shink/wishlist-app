@@ -114,3 +114,37 @@ export async function updateWishlistItem(id: string, values: Partial<z.infer<typ
   revalidatePath("/");
 }
 
+export async function getWishlistItems(month: string, sort: string = "created") {
+  const supabase = createSupabaseServerAnon();
+  let query = supabase.from("wishlist").select("*").eq("month", month);
+  if (sort === "created") {
+    query = query.order("created_at", { ascending: false });
+  }
+  const { data, error } = await query;
+  if (error) throw error;
+  const items = (data as any[]) ?? [];
+  
+  const sorted = (() => {
+    const arr = [...items];
+    switch (sort) {
+      case "priority-desc":
+        return arr.sort((a, b) => b.priority - a.priority);
+      case "priority-asc":
+        return arr.sort((a, b) => a.priority - b.priority);
+      case "price-desc":
+        return arr.sort((a, b) => (Number(b.price ?? 0)) - (Number(a.price ?? 0)));
+      case "price-asc":
+        return arr.sort((a, b) => (Number(a.price ?? 0)) - (Number(b.price ?? 0)));
+      case "deadline-asc":
+        return arr.sort((a, b) => (a.deadline ?? '').localeCompare(b.deadline ?? ''));
+      case "deadline-desc":
+        return arr.sort((a, b) => (b.deadline ?? '').localeCompare(a.deadline ?? ''));
+      case "created":
+      default:
+        return arr;
+    }
+  })();
+  
+  return sorted;
+}
+

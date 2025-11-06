@@ -1,13 +1,21 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
 export function SortSelector({ month, sort }: { month: string; sort: string }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   return (
     <select
       className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-      defaultValue={sort}
+      value={sort}
       onChange={(e) => {
         const s = e.target.value;
-        window.location.search = `?month=${month}&sort=${s}`;
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("month", month);
+        params.set("sort", s);
+        router.push(`/?${params.toString()}`);
       }}
     >
       <option value="created">登録順</option>
