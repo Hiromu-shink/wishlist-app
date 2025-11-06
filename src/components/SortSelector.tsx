@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function SortSelector({ month, sort }: { month: string; sort: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   
   return (
     <select
@@ -12,7 +11,7 @@ export function SortSelector({ month, sort }: { month: string; sort: string }) {
       value={sort}
       onChange={(e) => {
         const s = e.target.value;
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams();
         params.set("month", month);
         params.set("sort", s);
         router.push(`/?${params.toString()}`);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { LogoutButton } from "@/components/LogoutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,7 @@ export default function RootLayout({
           <header className="border-b">
             <div className="mx-auto max-w-3xl p-4 flex items-center justify-between">
               <a href="/" className="font-semibold">Wishlist</a>
-              <div className="text-sm text-gray-500">Guest mode</div>
+              <LogoutButton />
             </div>
           </header>
           {children}
