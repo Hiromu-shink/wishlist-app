@@ -122,12 +122,6 @@ export default function NewPage() {
           <label className="block text-sm mb-1">コメント</label>
           <textarea className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
         </div>
-        <div>
-          <label className="inline-flex items-center gap-2 mb-4">
-            <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
-            <span className="text-sm">☑️ 未定（いつか欲しい）</span>
-          </label>
-        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
@@ -141,17 +135,11 @@ export default function NewPage() {
           </div>
           <div className="flex items-end gap-2">
             <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
-              購入済み
+              <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
+              未定
             </label>
           </div>
         </div>
-        {form.is_purchased && (
-          <div>
-            <label className="block text-sm mb-1">購入日</label>
-            <input type="date" className="w-full border rounded px-3 py-2" value={form.purchased_date} onChange={(e) => setForm({ ...form, purchased_date: e.target.value })} />
-          </div>
-        )}
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex justify-end">
           <button type="submit" disabled={pending} className="px-4 py-2 border rounded disabled:opacity-60">{pending ? "送信中..." : "登録"}</button>
