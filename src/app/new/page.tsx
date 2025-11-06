@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createWishlistItem } from "@/app/actions/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { PriorityStars } from "@/components/PriorityStars";
 
 const schema = z.object({
   name: z.string().min(1, "必須です"),
@@ -24,7 +25,6 @@ export default function NewPage() {
     name: "",
     price: "",
     url: "",
-    image_url: "",
     comment: "",
     deadline: "",
     priority: 3,
@@ -84,7 +84,7 @@ export default function NewPage() {
           name: form.name,
           price: form.price ? Number(form.price) : null,
           url: form.url || null,
-          image_url: uploadedUrl || (form.image_url || null),
+          image_url: uploadedUrl || null,
           comment: form.comment || null,
           deadline: form.is_someday ? null : (form.deadline || null),
           priority: form.priority,
@@ -115,27 +115,33 @@ export default function NewPage() {
           <label htmlFor="name" className="block text-sm mb-1">登録名 *</label>
           <input id="name" name="name" className="w-full border rounded px-3 py-2" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="price" className="block text-sm mb-1">価格</label>
-            <input id="price" name="price" type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-          </div>
-          <div>
-            <label htmlFor="priority" className="block text-sm mb-1">優先度</label>
-            <input id="priority" name="priority" type="range" min={1} max={5} value={form.priority} onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })} />
-          </div>
+        <div>
+          <label htmlFor="price" className="block text-sm mb-1">価格</label>
+          <input id="price" name="price" type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+        </div>
+        <div>
+          <label htmlFor="priority" className="block text-sm mb-1">優先度</label>
+          <PriorityStars value={form.priority} onChange={(value) => setForm({ ...form, priority: value })} />
         </div>
         <div>
           <label htmlFor="url" className="block text-sm mb-1">URL</label>
           <input id="url" name="url" className="w-full border rounded px-3 py-2" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
         </div>
         <div>
-          <label htmlFor="image_url" className="block text-sm mb-1">画像URL（未設定なら自動取得予定）</label>
-          <input id="image_url" name="image_url" className="w-full border rounded px-3 py-2" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-        </div>
-        <div>
-          <label htmlFor="file_upload" className="block text-sm mb-1">画像アップロード（ストレージ）</label>
-          <input id="file_upload" name="file_upload" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <label htmlFor="file_upload" className="block text-sm mb-1">画像アップロード</label>
+          <label htmlFor="file_upload" className="block w-full border-2 border-dashed border-gray-300 rounded px-4 py-6 text-center cursor-pointer hover:border-gray-400 transition-colors">
+            <input 
+              id="file_upload" 
+              name="file_upload" 
+              type="file" 
+              accept="image/*" 
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+              className="hidden"
+            />
+            <span className="text-sm text-gray-600">
+              {file ? file.name : "ファイルを選択"}
+            </span>
+          </label>
         </div>
         <div>
           <label htmlFor="comment" className="block text-sm mb-1">コメント</label>

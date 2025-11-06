@@ -6,6 +6,7 @@ import { getWishlistItemById, updateWishlistItem, deleteWishlistItem } from "@/a
 import type { WishlistItem } from "@/types/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/ToastProvider";
+import { PriorityStars } from "@/components/PriorityStars";
 
 function Stars({ n }: { n: number }) {
   return (
@@ -230,16 +231,14 @@ export default function ItemDetailPage() {
             <input className="w-full border rounded px-3 py-2" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm mb-1">価格</label>
-              <input type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">優先度</label>
-              <input type="range" min={1} max={5} value={form.priority} onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })} />
-              <div className="text-center mt-1"><Stars n={form.priority} /></div>
-            </div>
+          <div>
+            <label className="block text-sm mb-1">価格</label>
+            <input type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+          </div>
+          
+          <div>
+            <label className="block text-sm mb-1">優先度</label>
+            <PriorityStars value={form.priority} onChange={(value) => setForm({ ...form, priority: value })} />
           </div>
 
           <div>
@@ -273,10 +272,14 @@ export default function ItemDetailPage() {
                 disabled={form.is_someday}
               />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-4">
               <label className="inline-flex items-center gap-2">
                 <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
                 未定
+              </label>
+              <label className="inline-flex items-center gap-2">
+                <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
+                購入済み
               </label>
             </div>
           </div>
