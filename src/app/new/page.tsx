@@ -30,6 +30,7 @@ export default function NewPage() {
     priority: 3,
     is_purchased: false,
     purchased_date: "",
+    is_someday: false,
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -66,10 +67,11 @@ export default function NewPage() {
           url: form.url || null,
           image_url: uploadedUrl || (form.image_url || null),
           comment: form.comment || null,
-          deadline: form.deadline || null,
+          deadline: form.is_someday ? null : (form.deadline || null),
           priority: form.priority,
           is_purchased: form.is_purchased,
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
+          is_someday: form.is_someday,
         });
         const d = form.deadline ? new Date(form.deadline) : new Date();
         const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -120,10 +122,22 @@ export default function NewPage() {
           <label className="block text-sm mb-1">コメント</label>
           <textarea className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
         </div>
+        <div>
+          <label className="inline-flex items-center gap-2 mb-4">
+            <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
+            <span className="text-sm">☑️ 未定（いつか欲しい）</span>
+          </label>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm mb-1">期限</label>
-            <input type="date" className="w-full border rounded px-3 py-2" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} />
+            <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
+            <input 
+              type="date" 
+              className={`w-full border rounded px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+              value={form.deadline} 
+              onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
+              disabled={form.is_someday}
+            />
           </div>
           <div className="flex items-end gap-2">
             <label className="inline-flex items-center gap-2">

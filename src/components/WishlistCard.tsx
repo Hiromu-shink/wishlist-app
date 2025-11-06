@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { WishlistItem } from "@/types/wishlist";
 import { WishlistActions } from "@/components/WishlistActions";
 import { WishlistQuickEdit } from "@/components/WishlistQuickEdit";
@@ -13,10 +16,14 @@ function Stars({ n }: { n: number }) {
 }
 
 export function WishlistCard({ item }: { item: WishlistItem }) {
+  const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
 
   return (
-    <div className={`border rounded p-3 flex gap-3 ${grayscale}`}>
+    <div 
+      className={`border rounded p-3 flex gap-3 ${grayscale} cursor-pointer hover:bg-gray-50 transition-colors`}
+      onClick={() => router.push(`/item/${item.id}`)}
+    >
       <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
         {item.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element

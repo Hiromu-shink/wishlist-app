@@ -12,7 +12,10 @@ export function WishlistActions({ id, isPurchased }: { id: string; isPurchased: 
         aria-label={isPurchased ? "未購入に戻す" : "購入済みにする"}
         className="px-2 py-1 border rounded text-xs disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
         disabled={pending}
-        onClick={() => startTransition(() => togglePurchased(id, !isPurchased))}
+        onClick={(e) => {
+          e.stopPropagation();
+          startTransition(() => togglePurchased(id, !isPurchased));
+        }}
       >
         {isPurchased ? "未購入に戻す" : "購入済みにする"}
       </button>
@@ -20,7 +23,10 @@ export function WishlistActions({ id, isPurchased }: { id: string; isPurchased: 
         aria-label="削除"
         className="px-2 py-1 border rounded text-xs disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
         disabled={pending}
-        onClick={() => startTransition(() => deleteWishlistItem(id))}
+        onClick={(e) => {
+          e.stopPropagation();
+          startTransition(() => deleteWishlistItem(id));
+        }}
       >
         削除
       </button>

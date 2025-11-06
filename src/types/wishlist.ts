@@ -1,6 +1,6 @@
 export type WishlistItem = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   price: number | null;
   url: string | null;
@@ -12,5 +12,6 @@ export type WishlistItem = {
   purchased_date: string | null; // ISO date string
   month: string; // e.g. "2024-11"
   created_at: string; // ISO timestamp
+  is_someday: boolean; // 未定（いつか欲しい）
 };
 

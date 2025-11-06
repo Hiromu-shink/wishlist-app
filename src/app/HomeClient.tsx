@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getWishlistItems } from "@/app/actions/wishlist";
+import { getWishlistItems, getSomedayItems } from "@/app/actions/wishlist";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { SortSelector } from "@/components/SortSelector";
@@ -27,6 +27,7 @@ export function HomeClient() {
   const sort = searchParams.get("sort") || "created";
   
   const [items, setItems] = useState<WishlistItem[]>([]);
+  const [somedayItems, setSomedayItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,18 +35,24 @@ export function HomeClient() {
     setIsLoading(true);
     startTransition(async () => {
       try {
-        const data = await getWishlistItems(month, sort);
+        const [data, someday] = await Promise.all([
+          getWishlistItems(month, sort),
+          getSomedayItems(),
+        ]);
         setItems(data as WishlistItem[]);
+        setSomedayItems(someday as WishlistItem[]);
       } catch (error) {
         console.error("Failed to load items:", error);
         setItems([]);
+        setSomedayItems([]);
       } finally {
         setIsLoading(false);
       }
     });
   }, [month, sort]);
 
-  const total = items.filter((i) => !i.is_purchased).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
+  // 合計計算: 購入済みと未定アイテムを除外
+  const total = items.filter((i) => !i.is_purchased && !i.is_someday).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
   const months = getAroundMonths();
 
   function handleMonthChange(newMonth: string) {
@@ -85,6 +92,17 @@ export function HomeClient() {
           items.map((item) => <WishlistCard key={item.id} item={item} />)
         )}
       </section>
+
+      {somedayItems.length > 0 && (
+        <section className="mt-8 pt-6 border-t">
+          <h2 className="text-lg font-semibold mb-4">いつか欲しいリスト</h2>
+          <div className="grid grid-cols-1 gap-3">
+            {somedayItems.map((item) => (
+              <WishlistCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -14,6 +14,7 @@ const inputSchema = z.object({
   priority: z.number().min(1).max(5),
   is_purchased: z.boolean().optional().default(false),
   purchased_date: z.string().nullable().optional(), // ISO date
+  is_someday: z.boolean().optional().default(false),
 });
 
 function calcMonth(isoDate?: string | null) {
@@ -69,11 +70,12 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
     url: parsed.url ?? null,
     image_url: imageUrl,
     comment: parsed.comment ?? null,
-    deadline,
+    deadline: parsed.is_someday ? null : deadline,
     priority: parsed.priority,
     is_purchased: parsed.is_purchased ?? false,
     purchased_date: normalizeDate(parsed.purchased_date ?? null),
-    month,
+    month: parsed.is_someday ? "someday" : month,
+    is_someday: parsed.is_someday ?? false,
   });
   if (error) throw error;
   revalidatePath("/");
@@ -109,9 +111,24 @@ export async function updateWishlistItem(id: string, values: Partial<z.infer<typ
   if (Object.prototype.hasOwnProperty.call(payload, 'purchased_date')) {
     payload.purchased_date = normalizeDate(payload.purchased_date);
   }
+  if (Object.prototype.hasOwnProperty.call(payload, 'is_someday')) {
+    if (payload.is_someday) {
+      payload.deadline = null;
+      payload.month = "someday";
+    } else if (payload.deadline) {
+      payload.month = calcMonth(payload.deadline ?? null);
+    }
+  }
   const { error } = await supabase.from("wishlist").update(payload).eq("id", id);
   if (error) throw error;
   revalidatePath("/");
+}
+
+export async function getWishlistItemById(id: string) {
+  const supabase = createSupabaseServerAnon();
+  const { data, error } = await supabase.from("wishlist").select("*").eq("id", id).single();
+  if (error) throw error;
+  return data as any;
 }
 
 export async function getWishlistItems(month: string, sort: string = "created") {
@@ -146,5 +163,12 @@ export async function getWishlistItems(month: string, sort: string = "created") 
   })();
   
   return sorted;
+}
+
+export async function getSomedayItems() {
+  const supabase = createSupabaseServerAnon();
+  const { data, error } = await supabase.from("wishlist").select("*").eq("month", "someday").order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as any[]) ?? [];
 }
 

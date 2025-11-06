@@ -53,3 +53,6 @@ drop policy if exists "public can delete wishlist" on public.wishlist;
 create policy "public can delete wishlist" on public.wishlist
   for delete using (true);
 
+-- Add is_someday column for "someday" wishlist items
+alter table if exists public.wishlist add column if not exists is_someday boolean not null default false;
+

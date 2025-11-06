@@ -29,7 +29,7 @@ export function WishlistQuickEdit({ id, price, deadline, priority }: { id: strin
   }
 
   return (
-    <div className="mt-2 flex flex-wrap items-end gap-2 text-sm">
+    <div className="mt-2 flex flex-wrap items-end gap-2 text-sm" onClick={(e) => e.stopPropagation()}>
       <label className="flex items-center gap-1">
         <span className="text-gray-600">価格</span>
         <input type="number" className="w-28 border rounded px-2 py-1" value={v.price} onChange={(e) => setV({ ...v, price: e.target.value })} />
