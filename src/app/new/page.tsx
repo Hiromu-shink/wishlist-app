@@ -52,13 +52,32 @@ export default function NewPage() {
             const supabase = getSupabaseBrowser();
             const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
             const path = `public/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-            const { error: upErr } = await supabase.storage.from('wishlist').upload(path, file, { upsert: true, contentType: file.type });
-            if (!upErr) {
+            console.log('Uploading file:', { name: file.name, size: file.size, type: file.type, path });
+            
+            const { error: upErr, data: uploadData } = await supabase.storage.from('wishlist').upload(path, file, { 
+              upsert: true, 
+              contentType: file.type,
+              cacheControl: '3600',
+            });
+            
+            if (upErr) {
+              console.error('Upload error:', upErr);
+              setError(`画像アップロードに失敗しました: ${upErr.message}`);
+              return;
+            }
+            
+            if (uploadData) {
               const { data: pub } = supabase.storage.from('wishlist').getPublicUrl(path);
               uploadedUrl = pub.publicUrl;
+              console.log('Image uploaded successfully:', uploadedUrl);
+              console.log('Public URL:', pub);
+            } else {
+              console.warn('Upload data is null');
             }
-          } catch {
-            // アップロード失敗時は無視（URL/OG画像にフォールバック）
+          } catch (uploadError: any) {
+            console.error('Upload failed:', uploadError);
+            setError(uploadError.message || "画像アップロードに失敗しました");
+            return;
           }
         }
         await createWishlistItem({
@@ -93,39 +112,41 @@ export default function NewPage() {
       </div>
       <form className="space-y-4" onSubmit={onSubmit}>
         <div>
-          <label className="block text-sm mb-1">登録名 *</label>
-          <input className="w-full border rounded px-3 py-2" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <label htmlFor="name" className="block text-sm mb-1">登録名 *</label>
+          <input id="name" name="name" className="w-full border rounded px-3 py-2" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm mb-1">価格</label>
-            <input type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+            <label htmlFor="price" className="block text-sm mb-1">価格</label>
+            <input id="price" name="price" type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
           </div>
           <div>
-            <label className="block text-sm mb-1">優先度</label>
-            <input type="range" min={1} max={5} value={form.priority} onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })} />
+            <label htmlFor="priority" className="block text-sm mb-1">優先度</label>
+            <input id="priority" name="priority" type="range" min={1} max={5} value={form.priority} onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })} />
           </div>
         </div>
         <div>
-          <label className="block text-sm mb-1">URL</label>
-          <input className="w-full border rounded px-3 py-2" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+          <label htmlFor="url" className="block text-sm mb-1">URL</label>
+          <input id="url" name="url" className="w-full border rounded px-3 py-2" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
         </div>
         <div>
-          <label className="block text-sm mb-1">画像URL（未設定なら自動取得予定）</label>
-          <input className="w-full border rounded px-3 py-2" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+          <label htmlFor="image_url" className="block text-sm mb-1">画像URL（未設定なら自動取得予定）</label>
+          <input id="image_url" name="image_url" className="w-full border rounded px-3 py-2" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
         </div>
         <div>
-          <label className="block text-sm mb-1">画像アップロード（ストレージ）</label>
-          <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <label htmlFor="file_upload" className="block text-sm mb-1">画像アップロード（ストレージ）</label>
+          <input id="file_upload" name="file_upload" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         </div>
         <div>
-          <label className="block text-sm mb-1">コメント</label>
-          <textarea className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
+          <label htmlFor="comment" className="block text-sm mb-1">コメント</label>
+          <textarea id="comment" name="comment" className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
+            <label htmlFor="deadline" className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
             <input 
+              id="deadline"
+              name="deadline"
               type="date" 
               className={`w-full border rounded px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
               value={form.deadline} 
@@ -134,8 +155,8 @@ export default function NewPage() {
             />
           </div>
           <div className="flex items-end gap-2">
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
+            <label htmlFor="is_someday" className="inline-flex items-center gap-2">
+              <input id="is_someday" name="is_someday" type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
               未定
             </label>
           </div>

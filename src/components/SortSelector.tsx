@@ -7,6 +7,7 @@ export function SortSelector({ month, sort }: { month: string; sort: string }) {
   
   return (
     <select
+      aria-label="並び替え"
       className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
       value={sort}
       onChange={(e) => {
