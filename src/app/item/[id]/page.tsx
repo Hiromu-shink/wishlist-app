@@ -95,11 +95,11 @@ export default function ItemDetailPage() {
           url: form.url || null,
           image_url: uploadedUrl || (form.image_url || null),
           comment: form.comment || null,
-          deadline: form.is_someday ? null : (form.deadline || null),
+          deadline: item.is_someday ? null : (form.deadline || null),
           priority: form.priority,
           is_purchased: form.is_purchased,
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
-          is_someday: form.is_someday,
+          is_someday: item.is_someday, // 編集画面では変更不可（新規登録時のみ設定可能）
         });
         
         push("更新しました");
@@ -252,8 +252,19 @@ export default function ItemDetailPage() {
           </div>
 
           <div>
-            <label className="block text-sm mb-1">画像アップロード</label>
-            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <label htmlFor="file_upload_edit" className="block text-sm mb-1">画像アップロード</label>
+            <label htmlFor="file_upload_edit" className="block w-full border-2 border-dashed border-gray-300 rounded px-4 py-6 text-center cursor-pointer hover:border-gray-400 transition-colors">
+              <input 
+                id="file_upload_edit" 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+                className="hidden"
+              />
+              <span className="text-sm text-gray-600">
+                {file ? file.name : "ファイルを選択"}
+              </span>
+            </label>
           </div>
 
           <div>
@@ -263,20 +274,16 @@ export default function ItemDetailPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
+              <label className={`block text-sm mb-1 ${item.is_someday ? "text-gray-400" : ""}`}>期限</label>
               <input 
                 type="date" 
-                className={`w-full border rounded px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`w-full border rounded px-3 py-2 ${item.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 value={form.deadline} 
                 onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
-                disabled={form.is_someday}
+                disabled={item.is_someday}
               />
             </div>
-            <div className="flex items-end gap-4">
-              <label className="inline-flex items-center gap-2">
-                <input type="checkbox" checked={form.is_someday} onChange={(e) => setForm({ ...form, is_someday: e.target.checked, deadline: e.target.checked ? "" : form.deadline })} />
-                未定
-              </label>
+            <div className="flex items-end gap-2">
               <label className="inline-flex items-center gap-2">
                 <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
                 購入済み
