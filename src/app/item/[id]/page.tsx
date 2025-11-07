@@ -71,6 +71,11 @@ export default function ItemDetailPage() {
   }, [id, router, push]);
 
   async function handleUpdate() {
+    if (!item) {
+      push("アイテム情報の取得に失敗しました");
+      return;
+    }
+    const currentItem = item;
     startTransition(async () => {
       try {
         let uploadedUrl: string | null = null;
@@ -95,11 +100,11 @@ export default function ItemDetailPage() {
           url: form.url || null,
           image_url: uploadedUrl || (form.image_url || null),
           comment: form.comment || null,
-          deadline: item.is_someday ? null : (form.deadline || null),
+          deadline: currentItem.is_someday ? null : (form.deadline || null),
           priority: form.priority,
           is_purchased: form.is_purchased,
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
-          is_someday: item.is_someday, // 編集画面では変更不可（新規登録時のみ設定可能）
+          is_someday: currentItem.is_someday, // 編集画面では変更不可（新規登録時のみ設定可能）
         });
         
         push("更新しました");
