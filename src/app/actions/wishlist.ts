@@ -172,3 +172,83 @@ export async function getSomedayItems() {
   return (data as any[]) ?? [];
 }
 
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+function extractMeta(html: string, key: string) {
+  const metaRegex = new RegExp(`<meta[^>]+(?:property|name)=["']${key}["'][^>]+content=["']([^"']+)["']`, "i");
+  const match = html.match(metaRegex);
+  return match?.[1]?.trim() ?? null;
+}
+
+function extractTitle(html: string) {
+  const match = html.match(/<title>([^<]+)<\/title>/i);
+  if (match?.[1]) {
+    return match[1].trim();
+  }
+  return null;
+}
+
+function extractPrice(html: string) {
+  const priceMetaKeys = [
+    "product:price:amount",
+    "og:price:amount",
+    "twitter:data1",
+    "og:price",
+  ];
+  for (const key of priceMetaKeys) {
+    const value = extractMeta(html, key);
+    if (value) {
+      const numeric = Number(value.replace(/[^0-9.,]/g, "").replace(/,/g, ""));
+      if (Number.isFinite(numeric)) return numeric;
+    }
+  }
+
+  const currencyRegex = /(¥|￥)\s*([0-9]{1,3}(?:,[0-9]{3})*)/;
+  const match = html.match(currencyRegex);
+  if (match?.[2]) {
+    const numeric = Number(match[2].replace(/,/g, ""));
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return null;
+}
+
+const metadataInputSchema = z.object({
+  url: z.string().url(),
+});
+
+export async function fetchUrlMetadata(values: z.infer<typeof metadataInputSchema>) {
+  const { url } = metadataInputSchema.parse(values);
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`ステータスコード: ${response.status}`);
+    }
+
+    const html = await response.text();
+    const image = extractMeta(html, "og:image") || extractMeta(html, "twitter:image") || null;
+    const title = extractMeta(html, "og:title") || extractTitle(html);
+    const price = extractPrice(html);
+
+    return {
+      ok: true as const,
+      data: {
+        title: title ?? null,
+        price,
+        imageUrl: image,
+      },
+    };
+  } catch (error: any) {
+    return {
+      ok: false as const,
+      error: error?.message ?? "メタデータ取得に失敗しました",
+    };
+  }
+}
+

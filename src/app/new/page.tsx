@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { z } from "zod";
-import { createWishlistItem } from "@/app/actions/wishlist";
+import { createWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { PriorityStars } from "@/components/PriorityStars";
@@ -11,7 +11,6 @@ const schema = z.object({
   name: z.string().min(1, "必須です"),
   price: z.string().optional(),
   url: z.string().url().optional().or(z.literal("")),
-  image_url: z.string().url().optional().or(z.literal("")),
   comment: z.string().optional(),
   deadline: z.string().optional(),
   priority: z.number().min(1).max(5),
@@ -34,7 +33,37 @@ export default function NewPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [metadataPending, startMetadataTransition] = useTransition();
+  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const [metadataImageUrl, setMetadataImageUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+
+  function handleFetchMetadata() {
+    if (!form.url) {
+      setMetadataError("URLを入力してください");
+      return;
+    }
+    startMetadataTransition(async () => {
+      setMetadataError(null);
+      const result = await fetchUrlMetadata({ url: form.url });
+      if (!result.ok) {
+        setMetadataError(result.error ?? "情報の取得に失敗しました");
+        return;
+      }
+
+      const { title, price, imageUrl } = result.data;
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || title || prev.name,
+        price: prev.price || (price !== null ? String(price) : ""),
+      }));
+      setMetadataImageUrl(imageUrl ?? null);
+
+      if (!title && price === null && !imageUrl) {
+        setMetadataError("情報が見つかりませんでした");
+      }
+    });
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -84,7 +113,7 @@ export default function NewPage() {
           name: form.name,
           price: form.price ? Number(form.price) : null,
           url: form.url || null,
-          image_url: uploadedUrl || null,
+          image_url: uploadedUrl || metadataImageUrl || null,
           comment: form.comment || null,
           deadline: form.is_someday ? null : (form.deadline || null),
           priority: form.priority,
@@ -125,7 +154,29 @@ export default function NewPage() {
         </div>
         <div>
           <label htmlFor="url" className="block text-sm mb-1">URL</label>
-          <input id="url" name="url" className="w-full border rounded px-3 py-2" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+          <div className="flex gap-2">
+            <input
+              id="url"
+              name="url"
+              className="w-full border rounded px-3 py-2"
+              value={form.url}
+              onChange={(e) => {
+                const value = e.target.value;
+                setForm((prev) => ({ ...prev, url: value }));
+                setMetadataError(null);
+                setMetadataImageUrl(null);
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleFetchMetadata}
+              className="whitespace-nowrap px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-60"
+              disabled={metadataPending}
+            >
+              {metadataPending ? "取得中..." : "自動入力"}
+            </button>
+          </div>
+          {metadataError && <p className="text-xs text-red-600 mt-1">{metadataError}</p>}
         </div>
         <div>
           <label htmlFor="file_upload" className="block text-sm mb-1">画像アップロード</label>
@@ -135,7 +186,12 @@ export default function NewPage() {
               name="file_upload" 
               type="file" 
               accept="image/*" 
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+              onChange={(e) => {
+                setFile(e.target.files?.[0] ?? null);
+                if (e.target.files?.[0]) {
+                  setMetadataImageUrl(null);
+                }
+              }} 
               className="hidden"
             />
             <span className="text-sm text-gray-600">
