@@ -288,7 +288,11 @@ export default function ItemDetailPage() {
                 disabled={item.is_someday}
               />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-4">
+              <label className="inline-flex items-center gap-2 text-gray-600">
+                <input type="checkbox" checked={item.is_someday} disabled className="rounded" />
+                未定
+              </label>
               <label className="inline-flex items-center gap-2">
                 <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
                 購入済み
