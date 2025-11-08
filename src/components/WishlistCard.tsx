@@ -42,7 +42,7 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
       }}
     >
       <div className="flex h-full flex-col p-4 text-left">
-        <div className="relative aspect-square w-full overflow-hidden rounded-md bg-[#f0f0f0]">
+        <div className="relative w-full h-[200px] overflow-hidden rounded-md bg-[#f0f0f0]">
           {item.image_url ? (
             <img src={item.image_url} alt={item.name} className="h-full w-full object-cover object-center" />
           ) : (
