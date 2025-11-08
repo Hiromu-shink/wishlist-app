@@ -62,7 +62,7 @@ export function HomeClient() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-6 space-y-6">
+    <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex items-center justify-between gap-4">
         <div className="flex gap-2 flex-wrap">
           {months.map((m) => (
@@ -83,11 +83,11 @@ export function HomeClient() {
         <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
         <a href="/new" className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">新規登録</a>
       </div>
-      <section className="grid grid-cols-1 gap-3">
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {isLoading || pending ? (
-          <p className="text-sm text-gray-500">読み込み中...</p>
+          <p className="text-sm text-gray-500 col-span-full">読み込み中...</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-gray-500">この月のアイテムはありません。</p>
+          <p className="text-sm text-gray-500 col-span-full">この月のアイテムはありません。</p>
         ) : (
           items.map((item) => <WishlistCard key={item.id} item={item} />)
         )}
@@ -96,7 +96,7 @@ export function HomeClient() {
       {somedayItems.length > 0 && (
         <section className="mt-8 pt-6 border-t">
           <h2 className="text-lg font-semibold mb-4">いつか欲しいリスト</h2>
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {somedayItems.map((item) => (
               <WishlistCard key={item.id} item={item} />
             ))}

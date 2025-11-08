@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getWishlistItemById, updateWishlistItem, deleteWishlistItem } from "@/app/actions/wishlist";
+import { getWishlistItemById, updateWishlistItem, deleteWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import type { WishlistItem } from "@/types/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -28,7 +28,9 @@ export default function ItemDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [metadataPending, startMetadataTransition] = useTransition();
   const [file, setFile] = useState<File | null>(null);
+  const [metadataError, setMetadataError] = useState<string | null>(null);
   
   const [form, setForm] = useState({
     name: "",
@@ -69,6 +71,31 @@ export default function ItemDetailPage() {
       }
     });
   }, [id, router, push]);
+
+  function handleFetchMetadata() {
+    if (!form.url) {
+      setMetadataError("URLを入力してください");
+      return;
+    }
+    startMetadataTransition(async () => {
+      setMetadataError(null);
+      const result = await fetchUrlMetadata({ url: form.url });
+      if (!result.ok) {
+        setMetadataError(result.error ?? "情報の取得に失敗しました");
+        return;
+      }
+      const { title, price, imageUrl } = result.data;
+      setForm((prev) => ({
+        ...prev,
+        name: title ?? prev.name,
+        price: price !== null ? String(price) : prev.price,
+        image_url: imageUrl ?? prev.image_url,
+      }));
+      if (!title && price === null && !imageUrl) {
+        setMetadataError("情報が見つかりませんでした");
+      }
+    });
+  }
 
   async function handleUpdate() {
     if (!item) {
@@ -248,7 +275,26 @@ export default function ItemDetailPage() {
 
           <div>
             <label className="block text-sm mb-1">URL</label>
-            <input className="w-full border rounded px-3 py-2" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+            <div className="flex gap-2">
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={form.url}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setForm({ ...form, url: value });
+                  setMetadataError(null);
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleFetchMetadata}
+                className="whitespace-nowrap px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-60"
+                disabled={metadataPending}
+              >
+                {metadataPending ? "取得中..." : "自動入力"}
+              </button>
+            </div>
+            {metadataError && <p className="text-xs text-red-600 mt-1">{metadataError}</p>}
           </div>
 
           <div>
@@ -263,7 +309,13 @@ export default function ItemDetailPage() {
                 id="file_upload_edit" 
                 type="file" 
                 accept="image/*" 
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+                onChange={(e) => {
+                  const selected = e.target.files?.[0] ?? null;
+                  setFile(selected);
+                  if (selected) {
+                    setMetadataError(null);
+                  }
+                }} 
                 className="hidden"
               />
               <span className="text-sm text-gray-600">

@@ -5,9 +5,9 @@ import { WishlistItem } from "@/types/wishlist";
 
 function Stars({ n }: { n: number }) {
   return (
-    <div className="flex gap-0.5" aria-label={`優先度 ${n}`}>
+    <div className="flex gap-0.5 text-lg" aria-label={`優先度 ${n}`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className="text-lg">{i < n ? "★" : "☆"}</span>
+        <span key={i}>{i < n ? "★" : "☆"}</span>
       ))}
     </div>
   );
@@ -21,14 +21,15 @@ function formatPrice(price: number | null): string {
 export function WishlistCard({ item }: { item: WishlistItem }) {
   const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
+  const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
 
   const handleCardClick = () => {
     router.push(`/item/${item.id}`);
   };
 
   return (
-    <div 
-      className={`border rounded p-3 flex gap-3 ${grayscale} cursor-pointer hover:bg-gray-50 transition-colors`}
+    <div
+      className={`h-full border rounded-xl bg-white flex flex-col overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -39,23 +40,23 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
         }
       }}
     >
-      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center flex-shrink-0">
+      <div className="relative aspect-square bg-gray-100">
         {item.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.image_url} alt={item.name} className="object-cover w-full h-full" />
         ) : (
-          <span className="text-xs text-gray-500 text-center p-2">{item.name}</span>
+          <div className="flex h-full w-full items-center justify-center p-3 text-xs text-gray-500 text-center">
+            {item.name}
+          </div>
         )}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <h3 className="font-medium truncate">{item.name}</h3>
+      <div className="flex-1 px-3 py-4 flex flex-col gap-2">
+        <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem]">{item.name}</h3>
+        <span className="text-base font-semibold text-gray-900">{formatPrice(item.price)}</span>
+        <div>
           <Stars n={item.priority} />
         </div>
-        <div className="text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
-          <span>{formatPrice(item.price)}</span>
-          <span>期限: {item.deadline ?? '-'}</span>
-        </div>
+        <span className="text-xs text-gray-600">期限: {deadlineLabel}</span>
       </div>
     </div>
   );
