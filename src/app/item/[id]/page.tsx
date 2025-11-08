@@ -339,13 +339,15 @@ export default function ItemDetailPage() {
                 onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
                 disabled={item.is_someday}
               />
+              {item.is_someday && (
+                <label className="mt-2 block text-xs text-gray-500">
+                  <input type="checkbox" checked disabled className="mr-1 align-middle" />
+                  未定
+                </label>
+              )}
             </div>
-            <div className="flex items-end gap-4">
-              <label className="inline-flex items-center gap-2 text-gray-600">
-                <input type="checkbox" checked={item.is_someday} disabled className="rounded" />
-                未定
-              </label>
-              <label className="inline-flex items-center gap-2">
+            <div className="flex items-end gap-2">
+              <label className="inline-flex items-center gap-2 ml-auto">
                 <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
                 購入済み
               </label>

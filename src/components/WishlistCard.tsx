@@ -30,7 +30,7 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
   return (
     <div
       className={`border rounded-xl bg-white overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition`}
-      style={{ aspectRatio: "13 / 10" }}
+      style={{ aspectRatio: "3 / 4" }}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -47,17 +47,15 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.image_url} alt={item.name} className="object-cover w-full h-full" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl text-gray-400">
-            📦
+          <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">
+            No Image
           </div>
         )}
         </div>
-        <div className="flex-1 px-3 py-4 flex flex-col gap-2">
+        <div className="flex-1 px-3 py-3 flex flex-col gap-1.5">
           <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem]">{item.name}</h3>
           <span className="text-base font-semibold text-gray-900">{formatPrice(item.price)}</span>
-          <div>
-            <Stars n={item.priority} />
-          </div>
+          <Stars n={item.priority} />
           <span className="text-xs text-gray-600">期限: {deadlineLabel}</span>
         </div>
       </div>
