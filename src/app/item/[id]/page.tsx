@@ -102,7 +102,6 @@ export default function ItemDetailPage() {
       push("アイテム情報の取得に失敗しました");
       return;
     }
-    const currentItem = item;
     startTransition(async () => {
       try {
         let uploadedUrl: string | null = null;
@@ -121,17 +120,18 @@ export default function ItemDetailPage() {
           }
         }
         
+        const isSomeday = form.is_someday;
         await updateWishlistItem(id, {
           name: form.name,
           price: form.price ? Number(form.price) : null,
           url: form.url || null,
           image_url: uploadedUrl || (form.image_url || null),
           comment: form.comment || null,
-          deadline: currentItem.is_someday ? null : (form.deadline || null),
+          deadline: isSomeday ? null : (form.deadline || null),
           priority: form.priority,
           is_purchased: form.is_purchased,
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
-          is_someday: currentItem.is_someday, // 編集画面では変更不可（新規登録時のみ設定可能）
+          is_someday: isSomeday,
         });
         
         push("更新しました");
@@ -329,26 +329,38 @@ export default function ItemDetailPage() {
             <textarea className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className={`block text-sm mb-1 ${item.is_someday ? "text-gray-400" : ""}`}>期限</label>
-              <div className="flex items-center gap-2">
-                <input 
-                  type="date" 
-                  className={`w-full border rounded px-3 py-2 ${item.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                  value={form.deadline} 
-                  onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
-                  disabled={item.is_someday}
-                />
-                <label className="inline-flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap">
-                  <input type="checkbox" checked={item.is_someday} disabled className="rounded" />
-                  未定
-                </label>
-              </div>
+              <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
+              <input
+                type="date"
+                className={`w-full border rounded px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                value={form.deadline}
+                onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                disabled={form.is_someday}
+              />
             </div>
-            <div className="flex items-end gap-2 justify-end">
-              <label className="inline-flex items-center gap-2">
-                <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
+            <div className="flex flex-col items-start justify-end gap-3 md:items-end md:gap-2">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.is_someday}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      is_someday: e.target.checked,
+                      deadline: e.target.checked ? "" : prev.deadline,
+                    }))
+                  }
+                />
+                未定
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.is_purchased}
+                  onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })}
+                />
                 購入済み
               </label>
             </div>
