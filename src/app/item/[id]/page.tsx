@@ -332,22 +332,22 @@ export default function ItemDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm mb-1 ${item.is_someday ? "text-gray-400" : ""}`}>期限</label>
-              <input 
-                type="date" 
-                className={`w-full border rounded px-3 py-2 ${item.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                value={form.deadline} 
-                onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
-                disabled={item.is_someday}
-              />
-              {item.is_someday && (
-                <label className="mt-2 block text-xs text-gray-500">
-                  <input type="checkbox" checked disabled className="mr-1 align-middle" />
+              <div className="flex items-center gap-2">
+                <input 
+                  type="date" 
+                  className={`w-full border rounded px-3 py-2 ${item.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                  value={form.deadline} 
+                  onChange={(e) => setForm({ ...form, deadline: e.target.value })} 
+                  disabled={item.is_someday}
+                />
+                <label className="inline-flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap">
+                  <input type="checkbox" checked={item.is_someday} disabled className="rounded" />
                   未定
                 </label>
-              )}
+              </div>
             </div>
-            <div className="flex items-end gap-2">
-              <label className="inline-flex items-center gap-2 ml-auto">
+            <div className="flex items-end gap-2 justify-end">
+              <label className="inline-flex items-center gap-2">
                 <input type="checkbox" checked={form.is_purchased} onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })} />
                 購入済み
               </label>
