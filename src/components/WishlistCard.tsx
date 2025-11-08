@@ -5,7 +5,7 @@ import { WishlistItem } from "@/types/wishlist";
 
 function Stars({ n }: { n: number }) {
   return (
-    <div className="flex gap-0.5 text-sm" aria-label={`優先度 ${n}`}>
+    <div className="flex gap-1 text-base text-[#FFD700]" aria-label={`優先度 ${n}`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i}>{i < n ? "★" : "☆"}</span>
       ))}
@@ -14,8 +14,8 @@ function Stars({ n }: { n: number }) {
 }
 
 function formatPrice(price: number | null): string {
-  if (price === null || price === undefined) return "-";
-  return `${price.toLocaleString()}円`;
+  if (price === null || price === undefined) return "¥-";
+  return `¥${price.toLocaleString()}`;
 }
 
 export function WishlistCard({ item }: { item: WishlistItem }) {
@@ -29,8 +29,8 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
 
   return (
     <div
-      className={`border rounded-xl bg-white overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition`}
-      style={{ aspectRatio: "3 / 4" }}
+      className={`border border-[#dddddd] rounded-lg bg-white overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition`}
+      style={{ aspectRatio: "10 / 14" }}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -41,24 +41,25 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
         }
       }}
     >
-      <div className="flex h-full flex-col">
-        <div className="relative aspect-square bg-gray-100">
+      <div className="flex h-full flex-col p-4 text-left">
+        <div className="relative aspect-square w-full overflow-hidden rounded-md bg-[#f0f0f0]">
           {item.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.image_url} alt={item.name} className="object-cover w-full h-full" />
+            <img src={item.image_url} alt={item.name} className="h-full w-full object-cover object-center" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">
+            <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">
               No Image
             </div>
           )}
         </div>
-        <div className="flex-1 px-3 py-3 flex flex-col gap-1.5">
-          <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem]">{item.name}</h3>
-          <div className="flex items-center justify-between text-sm text-gray-900">
-            <span className="font-semibold">{formatPrice(item.price)}</span>
+        <div className="mt-3 flex-1 flex flex-col">
+          <h3 className="text-base font-bold leading-snug text-[#333] line-clamp-2">
+            {item.name}
+          </h3>
+          <span className="mt-2 text-lg font-bold text-black">{formatPrice(item.price)}</span>
+          <div className="mt-2">
             <Stars n={item.priority} />
           </div>
-          <span className="text-xs text-gray-600">期限: {deadlineLabel}</span>
+          <span className="mt-2 text-sm text-[#666]">期限: {deadlineLabel}</span>
         </div>
       </div>
     </div>
