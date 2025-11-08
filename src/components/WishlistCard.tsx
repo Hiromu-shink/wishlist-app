@@ -29,8 +29,7 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
 
   return (
     <div
-      className={`border border-[#dddddd] rounded-lg bg-white overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition`}
-      style={{ aspectRatio: "10 / 14" }}
+      className={`border border-[#dddddd] rounded-lg bg-white overflow-hidden ${grayscale} cursor-pointer shadow-sm hover:shadow-md transition flex flex-col`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
