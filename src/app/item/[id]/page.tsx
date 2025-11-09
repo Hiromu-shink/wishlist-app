@@ -186,20 +186,12 @@ export default function ItemDetailPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">{item.name}</h1>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setEditing(true)}
-                className={buttonWhite}
-              >
-                編集
-              </button>
-              <button
-                onClick={() => router.push("/")}
-                className={buttonWhite}
-              >
-                トップへ戻る
-              </button>
-            </div>
+            <button
+              onClick={() => router.push("/")}
+              className={buttonWhite}
+            >
+              トップへ戻る
+            </button>
           </div>
 
           {item.image_url && (
@@ -257,10 +249,16 @@ export default function ItemDetailPage() {
             </div>
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              onClick={() => setEditing(true)}
+              className={buttonWhite}
+            >
+              編集
+            </button>
             <button
               onClick={handleDelete}
-              className={`${buttonBase} bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-500`}
+              className={`${buttonBase} border-red-500 text-red-600 hover:bg-red-50`}
             >
               削除
             </button>
