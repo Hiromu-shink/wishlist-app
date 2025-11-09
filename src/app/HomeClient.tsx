@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getWishlistItems, getSomedayItems } from "@/app/actions/wishlist";
 import { WishlistCard } from "@/components/WishlistCard";
@@ -10,14 +10,6 @@ import { SortSelector } from "@/components/SortSelector";
 function currentMonth() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function getAroundMonths(): string[] {
-  const now = new Date();
-  return [-2, -1, 0, 1, 2].map((d) => {
-    const dt = new Date(now.getFullYear(), now.getMonth() + d, 1);
-    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
-  });
 }
 
 export function HomeClient() {
@@ -30,6 +22,18 @@ export function HomeClient() {
   const [somedayItems, setSomedayItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
+
+  const monthOptions = useMemo(() => {
+    const startYear = 2025;
+    const years = 50;
+    const list: string[] = [];
+    for (let year = startYear; year < startYear + years; year += 1) {
+      for (let m = 1; m <= 12; m += 1) {
+        list.push(`${year}-${String(m).padStart(2, "0")}`);
+      }
+    }
+    return list;
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -53,7 +57,6 @@ export function HomeClient() {
 
   // 合計計算: 購入済みと未定アイテムを除外
   const total = items.filter((i) => !i.is_purchased && !i.is_someday).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
-  const months = getAroundMonths();
 
   function handleMonthChange(newMonth: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -63,24 +66,31 @@ export function HomeClient() {
 
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="w-full max-w-xs">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-            月を選択
-          </label>
-          <select
-            className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-            value={month}
-            onChange={(e) => handleMonthChange(e.target.value)}
-          >
-            {months.map((m) => (
-              <option key={m} value={m} className="font-medium">
-                {m}
-              </option>
-            ))}
-          </select>
+      <header className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="basis-1/3 min-w-[150px] text-left">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+              月を選択
+            </label>
+            <input
+              type="month"
+              className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              value={month}
+              min="2025-01"
+              max="2074-12"
+              list="month-options"
+              onChange={(e) => handleMonthChange(e.target.value)}
+            />
+            <datalist id="month-options">
+              {monthOptions.map((option) => (
+                <option value={option} key={option} />
+              ))}
+            </datalist>
+          </div>
+          <div className="basis-1/3 min-w-[150px] text-right">
+            <SortSelector month={month} sort={sort} className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
+          </div>
         </div>
-        <SortSelector month={month} sort={sort} />
       </header>
       <div className="flex items-center justify-between text-sm text-gray-700">
         <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
