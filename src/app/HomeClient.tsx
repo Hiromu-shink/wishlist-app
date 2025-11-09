@@ -63,19 +63,22 @@ export function HomeClient() {
 
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
-      <header className="flex items-center justify-between gap-4">
-        <div className="flex gap-2 flex-wrap">
-          {months.map((m) => (
-            <button
-              key={m}
-              onClick={() => handleMonthChange(m)}
-              className={`px-3 py-1 rounded border text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${
-                m === month ? "bg-black text-white" : "bg-white"
-              }`}
-            >
-              {m}
-            </button>
-          ))}
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full max-w-xs">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+            月を選択
+          </label>
+          <select
+            className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            value={month}
+            onChange={(e) => handleMonthChange(e.target.value)}
+          >
+            {months.map((m) => (
+              <option key={m} value={m} className="font-medium">
+                {m}
+              </option>
+            ))}
+          </select>
         </div>
         <SortSelector month={month} sort={sort} />
       </header>
