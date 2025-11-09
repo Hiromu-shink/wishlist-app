@@ -22,6 +22,7 @@ export function HomeClient() {
   const [somedayItems, setSomedayItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -34,6 +35,22 @@ export function HomeClient() {
     }
     return list;
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mq = window.matchMedia("(pointer: coarse)");
+      const update = (e: MediaQueryListEvent | MediaQueryList) => {
+        setIsTouchDevice(e.matches);
+      };
+      update(mq);
+      const handler = (e: MediaQueryListEvent) => update(e);
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    }
+    return () => {};
+  }, []);
+
+  const controlClass = "h-10 w-full max-w-[200px] min-w-[120px] rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black";
 
   useEffect(() => {
     setIsLoading(true);
@@ -68,27 +85,43 @@ export function HomeClient() {
     <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="basis-[45%] min-w-[140px] max-w-[200px] text-left">
-            <input
-              type="month"
-              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              value={month}
-              min="2025-01"
-              max="2074-12"
-              list="month-options"
-              onChange={(e) => handleMonthChange(e.target.value)}
-            />
-            <datalist id="month-options">
-              {monthOptions.map((option) => (
-                <option value={option} key={option} />
-              ))}
-            </datalist>
+          <div className="flex-1 min-w-[120px] max-w-[200px] text-left">
+            {isTouchDevice ? (
+              <>
+                <input
+                  type="month"
+                  className={controlClass}
+                  value={month}
+                  min="2025-01"
+                  max="2074-12"
+                  list="month-options"
+                  onChange={(e) => handleMonthChange(e.target.value)}
+                />
+                <datalist id="month-options">
+                  {monthOptions.map((option) => (
+                    <option value={option} key={option} />
+                  ))}
+                </datalist>
+              </>
+            ) : (
+              <select
+                className={controlClass}
+                value={month}
+                onChange={(e) => handleMonthChange(e.target.value)}
+              >
+                {monthOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
-          <div className="basis-[45%] min-w-[140px] max-w-[200px] text-right">
+          <div className="flex-1 min-w-[120px] max-w-[200px] text-right">
             <SortSelector
               month={month}
               sort={sort}
-              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className={controlClass}
             />
           </div>
         </div>
