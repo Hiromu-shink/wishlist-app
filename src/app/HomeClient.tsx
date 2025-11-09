@@ -84,8 +84,8 @@ export function HomeClient() {
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="w-[calc(50%-4px)] min-w-[150px] text-left">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex-shrink-0 w-[150px] text-left">
             {isTouchDevice ? (
               <>
                 <input
@@ -117,7 +117,7 @@ export function HomeClient() {
               </select>
             )}
           </div>
-          <div className="w-[calc(50%-4px)] min-w-[150px] text-right">
+          <div className="flex-shrink-0 w-[150px] text-right">
             <SortSelector
               month={month}
               sort={sort}
