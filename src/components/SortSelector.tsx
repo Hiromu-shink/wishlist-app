@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation";
 
+const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+
 export function SortSelector({ month, sort, className }: { month: string; sort: string; className?: string }) {
   const router = useRouter();
   
   return (
     <select
       aria-label="並び替え"
-      className={className ?? "border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"}
+      className={className ?? buttonBase}
       value={sort}
       onChange={(e) => {
         const s = e.target.value;

@@ -8,6 +8,11 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/ToastProvider";
 import { PriorityStars } from "@/components/PriorityStars";
 
+const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
+const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
+const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+
 function Stars({ n }: { n: number }) {
   return (
     <div className="flex gap-0.5" aria-label={`優先度 ${n}`}>
@@ -177,28 +182,26 @@ export default function ItemDetailPage() {
 
   return (
     <div className="mx-auto max-w-2xl p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{item.name}</h1>
-        {!editing && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => setEditing(true)}
-              className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-            >
-              編集
-            </button>
-            <button
-              onClick={() => router.push("/")}
-              className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-            >
-              トップへ戻る
-            </button>
-          </div>
-        )}
-      </div>
-
       {!editing ? (
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">{item.name}</h1>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setEditing(true)}
+                className={buttonWhite}
+              >
+                編集
+              </button>
+              <button
+                onClick={() => router.push("/")}
+                className={buttonWhite}
+              >
+                トップへ戻る
+              </button>
+            </div>
+          </div>
+
           {item.image_url && (
             <div className="w-full h-64 bg-gray-100 rounded overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -257,7 +260,7 @@ export default function ItemDetailPage() {
           <div className="flex gap-2 pt-4">
             <button
               onClick={handleDelete}
-              className="px-4 py-2 border rounded bg-red-50 text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className={`${buttonBase} bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-500`}
             >
               削除
             </button>
@@ -269,7 +272,7 @@ export default function ItemDetailPage() {
             <div>
               <label className="block font-medium text-gray-700">登録名</label>
               <input
-                className="mt-1 w-full rounded border px-3 py-2"
+                className={`mt-1 w-full ${inputBase}`}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
@@ -280,7 +283,7 @@ export default function ItemDetailPage() {
               <label className="block font-medium text-gray-700">価格</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border px-3 py-2"
+                className={`mt-1 w-full ${inputBase}`}
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
@@ -297,7 +300,7 @@ export default function ItemDetailPage() {
               <label className="block font-medium text-gray-700">URL</label>
               <div className="mt-1 flex gap-2">
                 <input
-                  className="w-full rounded border px-3 py-2"
+                  className={`w-full ${inputBase}`}
                   value={form.url}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -308,7 +311,7 @@ export default function ItemDetailPage() {
                 <button
                   type="button"
                   onClick={handleFetchMetadata}
-                  className="whitespace-nowrap rounded border px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+                  className={`${buttonBase} whitespace-nowrap disabled:opacity-60`}
                   disabled={metadataPending}
                 >
                   {metadataPending ? "取得中..." : "自動入力"}
@@ -350,7 +353,7 @@ export default function ItemDetailPage() {
               <div className="mt-1 flex items-center gap-3">
                 <input
                   type="date"
-                  className={`w-1/2 rounded border px-3 py-2 text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                  className={`w-1/2 ${inputBase} text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   value={form.deadline}
                   onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                   disabled={form.is_someday}
@@ -385,7 +388,7 @@ export default function ItemDetailPage() {
                 <label className="block font-medium text-gray-700">購入日</label>
                 <input
                   type="date"
-                  className="mt-1 w-1/2 rounded border px-3 py-2 text-right"
+                  className={`mt-1 w-1/2 ${inputBase} text-right`}
                   value={form.purchased_date}
                   onChange={(e) => setForm({ ...form, purchased_date: e.target.value })}
                 />
@@ -397,14 +400,14 @@ export default function ItemDetailPage() {
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="rounded border px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black"
+              className={buttonWhite}
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={pending}
-              className="rounded border bg-black px-4 py-2 font-medium text-white focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+              className={`${buttonBlack} disabled:opacity-60`}
             >
               {pending ? "更新中..." : "更新"}
             </button>

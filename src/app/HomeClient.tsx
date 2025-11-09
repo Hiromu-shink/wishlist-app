@@ -7,6 +7,9 @@ import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { SortSelector } from "@/components/SortSelector";
 
+const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
+
 function currentMonth() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -90,7 +93,7 @@ export function HomeClient() {
               <>
                 <input
                   type="month"
-                  className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className={`${buttonBase} w-full`}
                   value={month}
                   min="2025-01"
                   max="2074-12"
@@ -105,7 +108,7 @@ export function HomeClient() {
               </>
             ) : (
               <select
-                className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className={`${buttonBase} w-full`}
                 value={month}
                 onChange={(e) => handleMonthChange(e.target.value)}
               >
@@ -121,14 +124,14 @@ export function HomeClient() {
             <SortSelector
               month={month}
               sort={sort}
-              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className={`${buttonBase} w-full`}
             />
           </div>
         </div>
       </header>
       <div className="flex items-center justify-between text-sm text-gray-700">
         <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
-        <a href="/new" className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">新規登録</a>
+        <a href="/new" className={buttonWhite}>新規登録</a>
       </div>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading || pending ? (

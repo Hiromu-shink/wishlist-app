@@ -7,6 +7,11 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { PriorityStars } from "@/components/PriorityStars";
 
+const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
+const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
+const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+
 const schema = z.object({
   name: z.string().min(1, "必須です"),
   price: z.string().optional(),
@@ -146,7 +151,7 @@ export default function NewPage() {
             <input
               id="name"
               name="name"
-              className="mt-1 w-full rounded border px-3 py-2"
+              className={`mt-1 w-full ${inputBase}`}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
@@ -159,7 +164,7 @@ export default function NewPage() {
               id="price"
               name="price"
               type="number"
-              className="mt-1 w-full rounded border px-3 py-2"
+              className={`mt-1 w-full ${inputBase}`}
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
@@ -178,7 +183,7 @@ export default function NewPage() {
               <input
                 id="url"
                 name="url"
-                className="w-full rounded border px-3 py-2"
+                className={`w-full ${inputBase}`}
                 value={form.url}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -237,7 +242,7 @@ export default function NewPage() {
                 id="deadline"
                 name="deadline"
                 type="date"
-                className={`w-1/2 rounded border px-3 py-2 text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`w-1/2 ${inputBase} text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 value={form.deadline}
                 onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                 disabled={form.is_someday}
@@ -266,14 +271,14 @@ export default function NewPage() {
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="rounded border px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black"
+            className={buttonWhite}
           >
             キャンセル
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="rounded border bg-black px-4 py-2 font-medium text-white focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+            className={`${buttonBlack} disabled:opacity-60`}
           >
             {pending ? "送信中..." : "登録"}
           </button>
