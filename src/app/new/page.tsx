@@ -279,4 +279,7 @@ export default function NewPage() {
           </button>
         </div>
       </form>
+    </div>
+  );
+}
 
