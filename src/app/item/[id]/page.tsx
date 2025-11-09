@@ -179,20 +179,22 @@ export default function ItemDetailPage() {
     <div className="mx-auto max-w-2xl p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{item.name}</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setEditing(!editing)}
-            className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          >
-            {editing ? "キャンセル" : "編集"}
-          </button>
-          <button
-            onClick={() => router.push("/")}
-            className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          >
-            トップへ戻る
-          </button>
-        </div>
+        {!editing && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setEditing(true)}
+              className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            >
+              編集
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="px-3 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            >
+              トップへ戻る
+            </button>
+          </div>
+        )}
       </div>
 
       {!editing ? (
@@ -343,7 +345,7 @@ export default function ItemDetailPage() {
               <div className="mt-1 flex items-center gap-3">
                 <input
                   type="date"
-                  className={`w-full rounded border px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                  className={`w-1/2 rounded border px-3 py-2 text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   value={form.deadline}
                   onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                   disabled={form.is_someday}
@@ -362,30 +364,28 @@ export default function ItemDetailPage() {
                   />
                   未定
                 </label>
+                <label className="inline-flex items-center gap-2 text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={form.is_purchased}
+                    onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })}
+                  />
+                  購入済み
+                </label>
               </div>
             </div>
 
-            <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">
-              <label className="inline-flex items-center gap-2 text-gray-600">
+            {form.is_purchased && (
+              <div>
+                <label className="block font-medium text-gray-700">購入日</label>
                 <input
-                  type="checkbox"
-                  checked={form.is_purchased}
-                  onChange={(e) => setForm({ ...form, is_purchased: e.target.checked })}
+                  type="date"
+                  className="mt-1 w-1/2 rounded border px-3 py-2 text-right"
+                  value={form.purchased_date}
+                  onChange={(e) => setForm({ ...form, purchased_date: e.target.value })}
                 />
-                購入済み
-              </label>
-              {form.is_purchased && (
-                <div className="w-full md:w-auto">
-                  <label className="block text-gray-700">購入日</label>
-                  <input
-                    type="date"
-                    className="mt-1 w-full rounded border px-3 py-2"
-                    value={form.purchased_date}
-                    onChange={(e) => setForm({ ...form, purchased_date: e.target.value })}
-                  />
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

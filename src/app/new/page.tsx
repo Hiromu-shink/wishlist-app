@@ -237,7 +237,7 @@ export default function NewPage() {
                 id="deadline"
                 name="deadline"
                 type="date"
-                className={`w-full rounded border px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                className={`w-1/2 rounded border px-3 py-2 text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 value={form.deadline}
                 onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                 disabled={form.is_someday}
