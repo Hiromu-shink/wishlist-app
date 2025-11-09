@@ -220,8 +220,13 @@ export default function ItemDetailPage() {
           {item.url && (
             <div>
               <label className="text-sm text-gray-600">URL</label>
-              <p>
-                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+              <p className="mt-1">
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block w-full max-w-full truncate text-sm text-blue-600 hover:underline"
+                >
                   {item.url}
                 </a>
               </p>

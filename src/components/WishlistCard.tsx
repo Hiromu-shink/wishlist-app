@@ -51,14 +51,14 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
           )}
         </div>
         <div className="mt-3 flex-1 flex flex-col">
-          <h3 className="text-base font-bold leading-snug text-[#333] line-clamp-2">
+          <h3 className="text-base font-bold leading-snug text-[#333] line-clamp-2 min-h-[3.2rem]">
             {item.name}
           </h3>
-          <span className="mt-2 text-lg font-bold text-black">{formatPrice(item.price)}</span>
-          <div className="mt-2">
+          <div className="mt-auto space-y-2">
+            <span className="text-lg font-bold text-black">{formatPrice(item.price)}</span>
             <Stars n={item.priority} />
+            <span className="text-sm text-[#666]">期限: {deadlineLabel}</span>
           </div>
-          <span className="mt-2 text-sm text-[#666]">期限: {deadlineLabel}</span>
         </div>
       </div>
     </div>
