@@ -257,105 +257,116 @@ export default function ItemDetailPage() {
           </div>
         </div>
       ) : (
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleUpdate(); }}>
-          <div>
-            <label className="block text-sm mb-1">登録名 *</label>
-            <input className="w-full border rounded px-3 py-2" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          </div>
-          
-          <div>
-            <label className="block text-sm mb-1">価格</label>
-            <input type="number" className="w-full border rounded px-3 py-2" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-          </div>
-          
-          <div>
-            <label className="block text-sm mb-1">優先度</label>
-            <PriorityStars value={form.priority} onChange={(value) => setForm({ ...form, priority: value })} />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">URL</label>
-            <div className="flex gap-2">
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={form.url}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setForm({ ...form, url: value });
-                  setMetadataError(null);
-                }}
-              />
-              <button
-                type="button"
-                onClick={handleFetchMetadata}
-                className="whitespace-nowrap px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-60"
-                disabled={metadataPending}
-              >
-                {metadataPending ? "取得中..." : "自動入力"}
-              </button>
-            </div>
-            {metadataError && <p className="text-xs text-red-600 mt-1">{metadataError}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">画像URL</label>
-            <input className="w-full border rounded px-3 py-2" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-          </div>
-
-          <div>
-            <label htmlFor="file_upload_edit" className="block text-sm mb-1">画像アップロード</label>
-            <label htmlFor="file_upload_edit" className="block w-full border-2 border-dashed border-gray-300 rounded px-4 py-6 text-center cursor-pointer hover:border-gray-400 transition-colors">
-              <input 
-                id="file_upload_edit" 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => {
-                  const selected = e.target.files?.[0] ?? null;
-                  setFile(selected);
-                  if (selected) {
-                    setMetadataError(null);
-                  }
-                }} 
-                className="hidden"
-              />
-              <span className="text-sm text-gray-600">
-                {file ? file.name : "ファイルを選択"}
-              </span>
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">コメント</label>
-            <textarea className="w-full border rounded px-3 py-2" rows={4} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
+        <form className="space-y-5 text-sm" onSubmit={(e) => { e.preventDefault(); handleUpdate(); }}>
+          <div className="space-y-3">
             <div>
-              <label className={`block text-sm mb-1 ${form.is_someday ? "text-gray-400" : ""}`}>期限</label>
+              <label className="block font-medium text-gray-700">登録名</label>
               <input
-                type="date"
-                className={`w-full border rounded px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                value={form.deadline}
-                onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-                disabled={form.is_someday}
+                className="mt-1 w-full rounded border px-3 py-2"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
               />
             </div>
-            <div className="flex flex-col items-start justify-end gap-3 md:items-end md:gap-2">
-              <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+
+            <div>
+              <label className="block font-medium text-gray-700">価格</label>
+              <input
+                type="number"
+                className="mt-1 w-full rounded border px-3 py-2"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">優先度</label>
+              <div className="mt-2">
+                <PriorityStars value={form.priority} onChange={(value) => setForm({ ...form, priority: value })} />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">URL</label>
+              <div className="mt-1 flex gap-2">
                 <input
-                  type="checkbox"
-                  checked={form.is_someday}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      is_someday: e.target.checked,
-                      deadline: e.target.checked ? "" : prev.deadline,
-                    }))
-                  }
+                  className="w-full rounded border px-3 py-2"
+                  value={form.url}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm({ ...form, url: value });
+                    setMetadataError(null);
+                  }}
                 />
-                未定
+                <button
+                  type="button"
+                  onClick={handleFetchMetadata}
+                  className="whitespace-nowrap rounded border px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+                  disabled={metadataPending}
+                >
+                  {metadataPending ? "取得中..." : "自動入力"}
+                </button>
+              </div>
+              {metadataError && <p className="mt-1 text-xs text-red-600">{metadataError}</p>}
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">画像アップロード</label>
+              <label htmlFor="file_upload_edit" className="mt-1 block w-full cursor-pointer rounded border-2 border-dashed border-gray-300 px-4 py-6 text-center text-gray-600 hover:border-gray-400">
+                <input
+                  id="file_upload_edit"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const selected = e.target.files?.[0] ?? null;
+                    setFile(selected);
+                    if (selected) setMetadataError(null);
+                  }}
+                  className="hidden"
+                />
+                <span className="text-xs">{file ? file.name : "ファイルを選択"}</span>
               </label>
-              <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">コメント</label>
+              <textarea
+                className="mt-1 w-full rounded border px-3 py-2"
+                rows={4}
+                value={form.comment}
+                onChange={(e) => setForm({ ...form, comment: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700">期限</label>
+              <div className="mt-1 flex items-center gap-3">
+                <input
+                  type="date"
+                  className={`w-full rounded border px-3 py-2 ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                  value={form.deadline}
+                  onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                  disabled={form.is_someday}
+                />
+                <label className="inline-flex items-center gap-2 text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={form.is_someday}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        is_someday: e.target.checked,
+                        deadline: e.target.checked ? "" : prev.deadline,
+                      }))
+                    }
+                  />
+                  未定
+                </label>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">
+              <label className="inline-flex items-center gap-2 text-gray-600">
                 <input
                   type="checkbox"
                   checked={form.is_purchased}
@@ -363,28 +374,32 @@ export default function ItemDetailPage() {
                 />
                 購入済み
               </label>
+              {form.is_purchased && (
+                <div className="w-full md:w-auto">
+                  <label className="block text-gray-700">購入日</label>
+                  <input
+                    type="date"
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={form.purchased_date}
+                    onChange={(e) => setForm({ ...form, purchased_date: e.target.value })}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
-          {form.is_purchased && (
-            <div>
-              <label className="block text-sm mb-1">購入日</label>
-              <input type="date" className="w-full border rounded px-3 py-2" value={form.purchased_date} onChange={(e) => setForm({ ...form, purchased_date: e.target.value })} />
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="px-4 py-2 border rounded disabled:opacity-60"
+              className="rounded border px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={pending}
-              className="px-4 py-2 border rounded bg-black text-white disabled:opacity-60"
+              className="rounded border bg-black px-4 py-2 font-medium text-white focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
             >
               {pending ? "更新中..." : "更新"}
             </button>
