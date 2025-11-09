@@ -184,11 +184,11 @@ export default function ItemDetailPage() {
     <div className="mx-auto max-w-2xl p-6 space-y-6">
       {!editing ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{item.name}</h1>
+          <div className="flex flex-wrap items-start gap-2">
+            <h1 className="flex-1 text-2xl font-semibold break-words">{item.name}</h1>
             <button
               onClick={() => router.push("/")}
-              className={buttonWhite}
+              className={`${buttonWhite} flex-shrink-0 min-w-[120px]`}
             >
               トップへ戻る
             </button>
