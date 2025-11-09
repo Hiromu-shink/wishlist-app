@@ -20,13 +20,13 @@ export function SortSelector({ month, sort, className }: { month: string; sort: 
         router.push(`/?${params.toString()}`);
       }}
     >
-      <option value="created">登録順</option>
-      <option value="priority-desc">優先度(高い→低い)</option>
-      <option value="priority-asc">優先度(低い→高い)</option>
-      <option value="price-desc">金額(高い→低い)</option>
-      <option value="price-asc">金額(低い→高い)</option>
-      <option value="deadline-asc">期限(近い→遠い)</option>
-      <option value="deadline-desc">期限(遠い→近い)</option>
+      <option value="created-desc">新着順</option>
+      <option value="priority-desc">優先度 ▼</option>
+      <option value="priority-asc">優先度 ▲</option>
+      <option value="price-desc">価格 ▼</option>
+      <option value="price-asc">価格 ▲</option>
+      <option value="deadline-asc">期限 ▲</option>
+      <option value="deadline-desc">期限 ▼</option>
     </select>
   );
 }

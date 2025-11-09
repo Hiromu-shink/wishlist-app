@@ -131,10 +131,10 @@ export async function getWishlistItemById(id: string) {
   return data as any;
 }
 
-export async function getWishlistItems(month: string, sort: string = "created") {
+export async function getWishlistItems(month: string, sort: string = "created-desc") {
   const supabase = createSupabaseServerAnon();
   let query = supabase.from("wishlist").select("*").eq("month", month);
-  if (sort === "created") {
+  if (sort === "created-desc" || sort === "created") {
     query = query.order("created_at", { ascending: false });
   }
   const { data, error } = await query;
@@ -143,22 +143,43 @@ export async function getWishlistItems(month: string, sort: string = "created") 
   
   const sorted = (() => {
     const arr = [...items];
+    const toTime = (value?: string | null) => {
+      if (!value) return null;
+      const t = new Date(value).getTime();
+      return Number.isFinite(t) ? t : null;
+    };
     switch (sort) {
       case "priority-desc":
         return arr.sort((a, b) => b.priority - a.priority);
       case "priority-asc":
         return arr.sort((a, b) => a.priority - b.priority);
       case "price-desc":
-        return arr.sort((a, b) => (Number(b.price ?? 0)) - (Number(a.price ?? 0)));
+        return arr.sort((a, b) => Number(b.price ?? 0) - Number(a.price ?? 0));
       case "price-asc":
-        return arr.sort((a, b) => (Number(a.price ?? 0)) - (Number(b.price ?? 0)));
+        return arr.sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
       case "deadline-asc":
-        return arr.sort((a, b) => (a.deadline ?? '').localeCompare(b.deadline ?? ''));
+        return arr.sort((a, b) => {
+          const ta = toTime(a.deadline);
+          const tb = toTime(b.deadline);
+          if (ta === null && tb === null) return 0;
+          if (ta === null) return 1;
+          if (tb === null) return -1;
+          return ta - tb;
+        });
       case "deadline-desc":
-        return arr.sort((a, b) => (b.deadline ?? '').localeCompare(a.deadline ?? ''));
+        return arr.sort((a, b) => {
+          const ta = toTime(a.deadline);
+          const tb = toTime(b.deadline);
+          if (ta === null && tb === null) return 0;
+          if (ta === null) return 1;
+          if (tb === null) return -1;
+          return tb - ta;
+        });
+      case "created-desc":
       case "created":
+        return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
       default:
-        return arr;
+        return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
     }
   })();
   

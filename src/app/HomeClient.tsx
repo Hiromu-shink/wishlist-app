@@ -19,7 +19,7 @@ export function HomeClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const month = searchParams.get("month") || currentMonth();
-  const sort = searchParams.get("sort") || "created";
+  const sort = searchParams.get("sort") || "created-desc";
   
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [somedayItems, setSomedayItems] = useState<WishlistItem[]>([]);
