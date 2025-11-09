@@ -84,13 +84,13 @@ export function HomeClient() {
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex-1 min-w-[120px] max-w-[200px] text-left">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-[calc(50%-4px)] min-w-[150px] text-left">
             {isTouchDevice ? (
               <>
                 <input
                   type="month"
-                  className={controlClass}
+                  className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                   value={month}
                   min="2025-01"
                   max="2074-12"
@@ -105,7 +105,7 @@ export function HomeClient() {
               </>
             ) : (
               <select
-                className={controlClass}
+                className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 value={month}
                 onChange={(e) => handleMonthChange(e.target.value)}
               >
@@ -117,11 +117,11 @@ export function HomeClient() {
               </select>
             )}
           </div>
-          <div className="flex-1 min-w-[120px] max-w-[200px] text-right">
+          <div className="w-[calc(50%-4px)] min-w-[150px] text-right">
             <SortSelector
               month={month}
               sort={sort}
-              className={controlClass}
+              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
             />
           </div>
         </div>
