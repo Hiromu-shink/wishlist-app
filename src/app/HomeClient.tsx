@@ -68,13 +68,10 @@ export function HomeClient() {
     <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="basis-1/3 min-w-[150px] text-left">
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-              月を選択
-            </label>
+          <div className="basis-[45%] min-w-[140px] max-w-[200px] text-left">
             <input
               type="month"
-              className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               value={month}
               min="2025-01"
               max="2074-12"
@@ -87,8 +84,12 @@ export function HomeClient() {
               ))}
             </datalist>
           </div>
-          <div className="basis-1/3 min-w-[150px] text-right">
-            <SortSelector month={month} sort={sort} className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
+          <div className="basis-[45%] min-w-[140px] max-w-[200px] text-right">
+            <SortSelector
+              month={month}
+              sort={sort}
+              className="h-10 w-full rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            />
           </div>
         </div>
       </header>
