@@ -18,18 +18,13 @@ function formatPrice(price: number | null): string {
   return `¥${price.toLocaleString()}`;
 }
 
-export function WishlistCard({ item, referrerMonth }: { item: WishlistItem; referrerMonth?: string }) {
+export function WishlistCard({ item }: { item: WishlistItem }) {
   const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
   const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
 
   const handleCardClick = () => {
-    const params = new URLSearchParams();
-    if (referrerMonth) {
-      params.set("from", referrerMonth);
-    }
-    const query = params.toString();
-    router.push(`/item/${item.id}${query ? `?${query}` : ""}`);
+    router.push(`/item/${item.id}`);
   };
 
   return (

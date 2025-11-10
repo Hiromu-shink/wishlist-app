@@ -17,7 +17,7 @@ export function SortSelector({ month, sort, className }: { month: string; sort: 
         const params = new URLSearchParams();
         params.set("month", month);
         params.set("sort", s);
-        router.push(`/?${params.toString()}`);
+        router.push(`/month?${params.toString()}`);
       }}
     >
       <option value="created-desc">新着順</option>

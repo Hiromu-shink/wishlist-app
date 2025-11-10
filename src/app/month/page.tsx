@@ -1,12 +1,12 @@
 import { Suspense } from "react";
-import { HomeLanding } from "./HomeLanding";
+import { HomeClient } from "../HomeClient";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default function MonthPage() {
   return (
     <Suspense fallback={<div className="mx-auto max-w-3xl p-6"><p className="text-sm text-gray-500">読み込み中...</p></div>}>
-      <HomeLanding />
+      <HomeClient />
     </Suspense>
   );
 }

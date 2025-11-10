@@ -79,7 +79,7 @@ export function HomeClient() {
   function handleMonthChange(newMonth: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("month", newMonth);
-    router.push(`/?${params.toString()}`);
+    router.push(`/month?${params.toString()}`);
   }
 
   return (
@@ -137,7 +137,7 @@ export function HomeClient() {
         ) : items.length === 0 ? (
           <p className="text-sm text-gray-500 col-span-full">この月のアイテムはありません。</p>
         ) : (
-          items.map((item) => <WishlistCard key={item.id} item={item} referrerMonth={month} />)
+          items.map((item) => <WishlistCard key={item.id} item={item} />)
         )}
       </section>
 
@@ -146,7 +146,7 @@ export function HomeClient() {
           <h2 className="text-lg font-semibold mb-4">いつか欲しいリスト</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {somedayItems.map((item) => (
-              <WishlistCard key={item.id} item={item} referrerMonth="someday" />
+              <WishlistCard key={item.id} item={item} />
             ))}
           </div>
         </section>

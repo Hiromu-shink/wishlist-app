@@ -126,10 +126,7 @@ export default function NewPage() {
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
           is_someday: form.is_someday,
         });
-        const d = form.deadline ? new Date(form.deadline) : new Date();
-        const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        router.push(`/?month=${month}`);
-        router.refresh();
+        router.push("/");
       } catch (err: any) {
         setError(err.message ?? "登録に失敗しました");
       }
