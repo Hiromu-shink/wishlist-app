@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { getWishlistItemById, updateWishlistItem, deleteWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import type { WishlistItem } from "@/types/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
@@ -12,6 +12,11 @@ const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none foc
 const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
 const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
 const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+
+function currentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
 
 function Stars({ n }: { n: number }) {
   return (
@@ -27,6 +32,7 @@ export default function ItemDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const searchParams = useSearchParams();
   const { push } = useToast();
   
   const [item, setItem] = useState<WishlistItem | null>(null);
@@ -49,6 +55,16 @@ export default function ItemDetailPage() {
     purchased_date: "",
     is_someday: false,
   });
+
+  const fromMonth = searchParams.get("from");
+
+  function navigateBack() {
+    if (fromMonth) {
+      router.push(`/?month=${fromMonth}`);
+    } else {
+      router.push(`/?month=${currentMonth()}`);
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -187,7 +203,7 @@ export default function ItemDetailPage() {
           <div className="flex flex-wrap items-start gap-2">
             <h1 className="flex-1 text-2xl font-semibold break-words">{item.name}</h1>
             <button
-              onClick={() => router.push("/")}
+              onClick={navigateBack}
               className={`${buttonWhite} flex-shrink-0 min-w-[120px]`}
             >
               トップへ戻る

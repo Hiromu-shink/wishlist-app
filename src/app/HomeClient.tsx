@@ -53,8 +53,6 @@ export function HomeClient() {
     return () => {};
   }, []);
 
-  const controlClass = "h-10 w-full max-w-[200px] min-w-[120px] rounded border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black";
-
   useEffect(() => {
     setIsLoading(true);
     startTransition(async () => {
@@ -139,7 +137,7 @@ export function HomeClient() {
         ) : items.length === 0 ? (
           <p className="text-sm text-gray-500 col-span-full">この月のアイテムはありません。</p>
         ) : (
-          items.map((item) => <WishlistCard key={item.id} item={item} />)
+          items.map((item) => <WishlistCard key={item.id} item={item} referrerMonth={month} />)
         )}
       </section>
 
@@ -148,7 +146,7 @@ export function HomeClient() {
           <h2 className="text-lg font-semibold mb-4">いつか欲しいリスト</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {somedayItems.map((item) => (
-              <WishlistCard key={item.id} item={item} />
+              <WishlistCard key={item.id} item={item} referrerMonth="someday" />
             ))}
           </div>
         </section>

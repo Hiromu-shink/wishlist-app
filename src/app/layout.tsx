@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
-import { LogoutButton } from "@/components/LogoutButton";
+import { HeaderNav } from "@/components/HeaderNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastProvider>
-          <header className="border-b">
-            <div className="mx-auto max-w-3xl p-4 flex items-center justify-between">
-              <a href="/" className="font-semibold">Wishlist</a>
-              <LogoutButton />
-            </div>
-          </header>
+          <HeaderNav />
           {children}
         </ToastProvider>
       </body>

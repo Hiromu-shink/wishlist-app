@@ -18,13 +18,18 @@ function formatPrice(price: number | null): string {
   return `¥${price.toLocaleString()}`;
 }
 
-export function WishlistCard({ item }: { item: WishlistItem }) {
+export function WishlistCard({ item, referrerMonth }: { item: WishlistItem; referrerMonth?: string }) {
   const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
   const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
 
   const handleCardClick = () => {
-    router.push(`/item/${item.id}`);
+    const params = new URLSearchParams();
+    if (referrerMonth) {
+      params.set("from", referrerMonth);
+    }
+    const query = params.toString();
+    router.push(`/item/${item.id}${query ? `?${query}` : ""}`);
   };
 
   return (
@@ -36,7 +41,7 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          router.push(`/item/${item.id}`);
+          handleCardClick();
         }
       }}
     >
@@ -51,7 +56,7 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
           )}
         </div>
         <div className="mt-3 flex-1 flex flex-col">
-          <h3 className="text-base font-bold leading-snug text-[#333] line-clamp-2 min-h-[3.2rem]">
+          <h3 className="text-base font-bold leading-snug text-[#333] line-clamp-2 min-h-[3.25rem]">
             {item.name}
           </h3>
           <div className="mt-auto space-y-2">
