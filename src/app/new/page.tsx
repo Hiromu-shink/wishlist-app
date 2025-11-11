@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { z } from "zod";
 import { createWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
@@ -11,6 +11,7 @@ const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none foc
 const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
 const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
 const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const removeBadge = "absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-xs font-semibold text-gray-600 shadow";
 
 const schema = z.object({
   name: z.string().min(1, "必須です"),
@@ -42,6 +43,21 @@ export default function NewPage() {
   const [metadataError, setMetadataError] = useState<string | null>(null);
   const [metadataImageUrl, setMetadataImageUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
+
+  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : null);
+
+  useEffect(() => {
+    if (!file) {
+      setUploadedPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setUploadedPreview(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
 
   function handleFetchMetadata() {
     if (!form.url) {
@@ -192,7 +208,7 @@ export default function NewPage() {
               <button
                 type="button"
                 onClick={handleFetchMetadata}
-                className="whitespace-nowrap rounded border px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+                className={`${buttonWhite} whitespace-nowrap disabled:opacity-60`}
                 disabled={metadataPending}
               >
                 {metadataPending ? "取得中..." : "自動入力"}
@@ -202,22 +218,52 @@ export default function NewPage() {
           </div>
 
           <div>
-            <label htmlFor="file_upload" className="block font-medium text-gray-700">画像アップロード</label>
-            <label htmlFor="file_upload" className="mt-1 block w-full cursor-pointer rounded border-2 border-dashed border-gray-300 px-4 py-6 text-center text-gray-600 hover:border-gray-400">
-              <input
-                id="file_upload"
-                name="file_upload"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const selected = e.target.files?.[0] ?? null;
-                  setFile(selected);
-                  if (selected) setMetadataImageUrl(null);
-                }}
-                className="hidden"
-              />
-              <span className="text-xs">{file ? file.name : "ファイルを選択"}</span>
-            </label>
+            <label className="block font-medium text-gray-700">画像</label>
+            <div className="mt-2 space-y-2">
+              {displayImage ? (
+                <div className="relative w-48 h-48 overflow-hidden rounded border bg-gray-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={displayImage} alt="プレビュー" className="h-full w-full object-cover object-center" />
+                  {uploadedPreview && (
+                    <button
+                      type="button"
+                      className={removeBadge}
+                      onClick={() => setFile(null)}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex h-48 w-48 items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 text-xs text-gray-500">
+                  No Image
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <label className={`${buttonWhite} inline-flex cursor-pointer items-center gap-2`}>📷 画像を選択
+                  <input
+                    id="file_upload"
+                    name="file_upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const selected = e.target.files?.[0] ?? null;
+                      setFile(selected);
+                      setMetadataError(null);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                {uploadedPreview && (
+                  <button type="button" onClick={() => setFile(null)} className={buttonWhite}>
+                    アップロードをクリア
+                  </button>
+                )}
+              </div>
+              {metadataImageUrl && !uploadedPreview && (
+                <p className="text-xs text-gray-500">OGP 画像を使用中</p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -267,10 +313,10 @@ export default function NewPage() {
         <div className="flex justify-end gap-2 pt-4">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push("/")}
             className={buttonWhite}
           >
-            戻る
+            キャンセル
           </button>
           <button
             type="submit"

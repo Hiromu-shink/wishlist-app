@@ -18,6 +18,13 @@ function formatPrice(price: number | null): string {
   return `¥${price.toLocaleString()}`;
 }
 
+function formatDate(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("ja-JP");
+}
+
 export function WishlistCard({ item }: { item: WishlistItem }) {
   const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
@@ -57,7 +64,13 @@ export function WishlistCard({ item }: { item: WishlistItem }) {
           <div className="mt-auto space-y-2">
             <span className="text-lg font-bold text-black">{formatPrice(item.price)}</span>
             <Stars n={item.priority} />
-            <span className="text-sm text-[#666]">期限: {deadlineLabel}</span>
+            <span className="text-sm text-[#666]">
+              {item.is_purchased
+                ? `購入: ${formatDate(item.purchased_date) ?? "-"}`
+                : item.deadline
+                ? `期限: ${formatDate(item.deadline)}`
+                : "期限: 未定"}
+            </span>
           </div>
         </div>
       </div>

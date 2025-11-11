@@ -12,6 +12,7 @@ const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none foc
 const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
 const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
 const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const removeBadge = "absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-xs font-semibold text-gray-600 shadow";
 
 function Stars({ n }: { n: number }) {
   return (
@@ -34,7 +35,9 @@ export default function ItemDetailPage() {
   const [editing, setEditing] = useState(false);
   const [pending, startTransition] = useTransition();
   const [metadataPending, startMetadataTransition] = useTransition();
+  const [metadataImageUrl, setMetadataImageUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [metadataError, setMetadataError] = useState<string | null>(null);
   
   const [form, setForm] = useState({
@@ -49,6 +52,26 @@ export default function ItemDetailPage() {
     purchased_date: "",
     is_someday: false,
   });
+
+  useEffect(() => {
+    if (!file) {
+      setUploadedPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setUploadedPreview(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
+
+  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : item.image_url ?? null);
+
+  useEffect(() => {
+    if (form.is_purchased && !form.purchased_date) {
+      setForm((prev) => ({ ...prev, purchased_date: new Date().toISOString().slice(0, 10) }));
+    }
+  }, [form.is_purchased]);
 
   useEffect(() => {
     if (!id) return;
@@ -237,8 +260,12 @@ export default function ItemDetailPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-gray-600">期限</label>
-              <p>{item.deadline || (item.is_someday ? "未定" : "-")}</p>
+              <label className="text-sm text-gray-600">{item.is_purchased ? "購入" : "期限"}</label>
+              <p>
+                {item.is_purchased
+                  ? (item.purchased_date ? new Date(item.purchased_date).toLocaleDateString("ja-JP") : "-")
+                  : (item.deadline ? new Date(item.deadline).toLocaleDateString("ja-JP") : item.is_someday ? "未定" : "-")}
+              </p>
             </div>
             <div>
               <label className="text-sm text-gray-600">状態</label>
@@ -309,7 +336,7 @@ export default function ItemDetailPage() {
                 <button
                   type="button"
                   onClick={handleFetchMetadata}
-                  className={`${buttonBase} whitespace-nowrap disabled:opacity-60`}
+                  className={`${buttonWhite} whitespace-nowrap disabled:opacity-60`}
                   disabled={metadataPending}
                 >
                   {metadataPending ? "取得中..." : "自動入力"}
@@ -319,21 +346,47 @@ export default function ItemDetailPage() {
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700">画像アップロード</label>
-              <label htmlFor="file_upload_edit" className="mt-1 block w-full cursor-pointer rounded border-2 border-dashed border-gray-300 px-4 py-6 text-center text-gray-600 hover:border-gray-400">
-                <input
-                  id="file_upload_edit"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const selected = e.target.files?.[0] ?? null;
-                    setFile(selected);
-                    if (selected) setMetadataError(null);
-                  }}
-                  className="hidden"
-                />
-                <span className="text-xs">{file ? file.name : "ファイルを選択"}</span>
-              </label>
+              <label className="block font-medium text-gray-700">画像</label>
+              <div className="mt-2 space-y-2">
+                {displayImage ? (
+                  <div className="relative w-48 h-48 overflow-hidden rounded border bg-gray-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={displayImage} alt="プレビュー" className="h-full w-full object-cover object-center" />
+                    {uploadedPreview && (
+                      <button type="button" className={removeBadge} onClick={() => setFile(null)}>
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex h-48 w-48 items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 text-xs text-gray-500">
+                    No Image
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <label className={`${buttonWhite} inline-flex cursor-pointer items-center gap-2`}>📷 画像を選択
+                    <input
+                      id="file_upload_edit"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const selected = e.target.files?.[0] ?? null;
+                        setFile(selected);
+                        setMetadataError(null);
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                  {uploadedPreview && (
+                    <button type="button" onClick={() => setFile(null)} className={buttonWhite}>
+                      アップロードをクリア
+                    </button>
+                  )}
+                </div>
+                {metadataImageUrl && !uploadedPreview && (
+                  <p className="text-xs text-gray-500">OGP 画像を使用中</p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -347,14 +400,14 @@ export default function ItemDetailPage() {
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700">期限</label>
-              <div className="mt-1 flex items-center gap-3">
+              <label className="block font-medium text-gray-700">期限 / 購入日</label>
+              <div className="mt-1 flex flex-wrap items-center gap-3">
                 <input
                   type="date"
                   className={`w-1/2 ${inputBase} text-right ${form.is_someday ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   value={form.deadline}
                   onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-                  disabled={form.is_someday}
+                  disabled={form.is_someday || form.is_purchased}
                 />
                 <label className="inline-flex items-center gap-2 text-gray-600">
                   <input
