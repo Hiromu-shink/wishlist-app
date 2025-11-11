@@ -50,10 +50,6 @@ export default function ItemDetailPage() {
     is_someday: false,
   });
 
-  function navigateBack() {
-    router.push("/");
-  }
-
   useEffect(() => {
     if (!id) return;
     startTransition(async () => {
@@ -191,10 +187,10 @@ export default function ItemDetailPage() {
           <div className="flex flex-wrap items-start gap-2">
             <h1 className="flex-1 text-2xl font-semibold break-words">{item.name}</h1>
             <button
-              onClick={navigateBack}
+              onClick={() => router.back()}
               className={`${buttonWhite} flex-shrink-0 min-w-[120px]`}
             >
-              トップへ戻る
+              戻る
             </button>
           </div>
 

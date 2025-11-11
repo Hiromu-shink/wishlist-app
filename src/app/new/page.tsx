@@ -267,10 +267,10 @@ export default function NewPage() {
         <div className="flex justify-end gap-2 pt-4">
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.back()}
             className={buttonWhite}
           >
-            キャンセル
+            戻る
           </button>
           <button
             type="submit"
