@@ -65,7 +65,7 @@ export default function ItemDetailPage() {
     };
   }, [file]);
 
-  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : item.image_url ?? null);
+  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : item?.image_url ?? null);
 
   useEffect(() => {
     if (form.is_purchased && !form.purchased_date) {
