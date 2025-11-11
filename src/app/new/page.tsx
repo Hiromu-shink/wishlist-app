@@ -45,7 +45,7 @@ export default function NewPage() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
 
-  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : null);
+  const displayImage = uploadedPreview ?? metadataImageUrl ?? null;
 
   useEffect(() => {
     if (!file) {
