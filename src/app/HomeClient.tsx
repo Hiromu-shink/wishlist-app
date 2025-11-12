@@ -129,7 +129,6 @@ export function HomeClient() {
       </header>
       <div className="flex items-center justify-between text-sm text-gray-700">
         <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
-        <a href="/new" className={buttonWhite}>新規登録</a>
       </div>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading || pending ? (

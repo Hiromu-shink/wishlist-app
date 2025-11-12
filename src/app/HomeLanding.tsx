@@ -1,101 +1,154 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-
-const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
-const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
-const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
+import Link from "next/link";
+import { createSupabaseServerAnon } from "@/lib/supabase/server";
+import type { WishlistItem } from "@/types/wishlist";
 
 function currentMonth() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-export function HomeLanding() {
-  const router = useRouter();
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth());
+function formatDate(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("ja-JP");
+}
 
-  const monthOptions = useMemo(() => {
-    const startYear = 2025;
-    const years = 5;
-    const list: string[] = [];
-    for (let year = startYear; year < startYear + years; year += 1) {
-      for (let m = 1; m <= 12; m += 1) {
-        list.push(`${year}-${String(m).padStart(2, "0")}`);
-      }
-    }
-    return list;
-  }, []);
+function pickRandom<T>(items: T[]): T | null {
+  if (!items.length) return null;
+  return items[Math.floor(Math.random() * items.length)] ?? null;
+}
 
-  const navigateToMonth = (month: string) => {
-    router.push(`/month?month=${month}`);
-  };
+function pickCurrentHighlight(items: WishlistItem[]): WishlistItem | null {
+  if (!items.length) return null;
+  const now = new Date();
+  const soon = items
+    .filter((item) => item.deadline)
+    .filter((item) => {
+      const date = new Date(item.deadline as string);
+      if (Number.isNaN(date.getTime())) return false;
+      const diff = (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+      return diff >= 0 && diff <= 7;
+    })
+    .sort((a, b) => new Date(a.deadline as string).getTime() - new Date(b.deadline as string).getTime());
+  if (soon.length) return soon[0];
+
+  const highPriority = items.filter((item) => item.priority >= 4);
+  if (highPriority.length) return pickRandom(highPriority);
+
+  return pickRandom(items);
+}
+
+function Card({ title, description, footer, href }: { title: string; description: React.ReactNode; footer?: React.ReactNode; href: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex h-full flex-col justify-between rounded-xl border border-[#dddddd] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold text-[#333]">{title}</h3>
+        <div className="text-sm text-[#555] space-y-1">{description}</div>
+      </div>
+      {footer && <div className="mt-4 text-xs text-[#777]">{footer}</div>}
+    </Link>
+  );
+}
+
+export async function HomeLanding() {
+  const month = currentMonth();
+  const supabase = createSupabaseServerAnon();
+
+  const [{ data: currentItems }, { data: somedayItems }, { data: purchasedItems }, { data: allItems }] = await Promise.all([
+    supabase.from("wishlist").select("*").eq("month", month),
+    supabase.from("wishlist").select("*").eq("month", "someday"),
+    supabase.from("wishlist").select("*").eq("is_purchased", true),
+    supabase.from("wishlist").select("price, is_purchased, month"),
+  ]);
+
+  const highlightCurrent = pickCurrentHighlight((currentItems as WishlistItem[]) ?? []);
+  const highlightSomeday = pickRandom((somedayItems as WishlistItem[]) ?? []);
+  const highlightPurchased = pickRandom((purchasedItems as WishlistItem[]) ?? []);
+
+  const totalPrice = ((allItems as WishlistItem[]) ?? []).reduce((sum, item) => sum + Number(item.price ?? 0), 0);
+  const totalCount = (allItems ?? []).length;
+  const currentBudget = "未設定";
+  const currentRemaining = "-";
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-6">
+    <div className="mx-auto flex max-w-5xl flex-col gap-6 p-6">
       <section className="space-y-2">
-        <h1 className="text-2xl font-semibold">Wishlist ホーム</h1>
-        <p className="text-sm text-gray-600">
-          見たい月を選んで、欲しいものリストを確認しましょう。
-        </p>
+        <h1 className="text-2xl font-semibold">ホーム</h1>
+        <p className="text-sm text-gray-600">見たいリストを選んでください。</p>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">月を選択</h2>
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="month"
-            value={selectedMonth}
-            min={monthOptions[0]}
-            max={monthOptions[monthOptions.length - 1]}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className={`${buttonWhite} w-[170px]`}
-          />
-          <button
-            onClick={() => navigateToMonth(selectedMonth)}
-            className={buttonBlack}
-          >
-            この月を見る
-          </button>
-          <button
-            onClick={() => navigateToMonth(currentMonth())}
-            className={buttonWhite}
-          >
-            今月を見る
-          </button>
-        </div>
-      </section>
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card
+          href={`/month?month=${month}`}
+          title="今月の欲しいもの"
+          description={
+            highlightCurrent ? (
+              <>
+                <p className="font-medium text-[#222] line-clamp-2">{highlightCurrent.name}</p>
+                <p>価格: {highlightCurrent.price ? `¥${Number(highlightCurrent.price).toLocaleString()}` : "-"}</p>
+                <p>
+                  {highlightCurrent.deadline
+                    ? `期限: ${formatDate(highlightCurrent.deadline)}`
+                    : highlightCurrent.is_someday
+                    ? "期限: 未定"
+                    : "期限: -"}
+                </p>
+              </>
+            ) : (
+              <p>今月のアイテムがありません。新規登録してみましょう。</p>
+            )
+          }
+        />
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">ショートカット</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {monthOptions.slice(0, 8).map((month) => (
-            <button
-              key={month}
-              onClick={() => navigateToMonth(month)}
-              className={buttonWhite}
-            >
-              {month}
-            </button>
-          ))}
-        </div>
-        <div>
-          <button
-            onClick={() => router.push("/month?month=someday")}
-            className={buttonWhite}
-          >
-            いつか欲しいリストを見る
-          </button>
-        </div>
-      </section>
+        <Card
+          href="/month?month=someday"
+          title="いつか欲しいもの"
+          description={
+            highlightSomeday ? (
+              <>
+                <p className="font-medium text-[#222] line-clamp-2">{highlightSomeday.name}</p>
+                <p>優先度: {"★".repeat(highlightSomeday.priority)}</p>
+                <p>価格: {highlightSomeday.price ? `¥${Number(highlightSomeday.price).toLocaleString()}` : "-"}</p>
+              </>
+            ) : (
+              <p>いつか欲しいリストは空です。</p>
+            )
+          }
+        />
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">新規登録</h2>
-        <p className="text-sm text-gray-600">欲しいものを追加する場合はこちらから。</p>
-        <button onClick={() => router.push("/new")} className={buttonBlack}>
-          欲しいものを登録する
-        </button>
+        <Card
+          href="/purchased"
+          title="購入済みリスト"
+          description={
+            highlightPurchased ? (
+              <>
+                <p className="font-medium text-[#222] line-clamp-2">{highlightPurchased.name}</p>
+                <p>購入日: {formatDate(highlightPurchased.purchased_date) ?? "-"}</p>
+                <p>価格: {highlightPurchased.price ? `¥${Number(highlightPurchased.price).toLocaleString()}` : "-"}</p>
+              </>
+            ) : (
+              <p>まだ購入済みアイテムがありません。</p>
+            )
+          }
+        />
+
+        <Card
+          href="/stats"
+          title="統計・ダッシュボード"
+          description={
+            <>
+              <p>全体の合計金額: ¥{totalPrice.toLocaleString()}</p>
+              <p>全体のアイテム数: {totalCount}</p>
+              <p>今月の予算: {currentBudget}</p>
+              <p>残り: {currentRemaining}</p>
+            </>
+          }
+          footer={<p>※ 統計ページは今後追加予定です。</p>}
+        />
       </section>
     </div>
   );

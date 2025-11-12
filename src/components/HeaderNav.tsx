@@ -3,14 +3,28 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 
+const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
+const iconButton = `${buttonBase} bg-white hover:bg-gray-50 flex items-center justify-center w-10`;
+
 export function HeaderNav() {
   return (
-    <header className="border-b">
-      <div className="mx-auto max-w-3xl p-4 flex items-center justify-between">
-        <Link href="/" className="font-semibold">
+    <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
+        <Link href="/" className="font-semibold text-lg">
           Wishlist
         </Link>
-        <LogoutButton />
+        <div className="flex items-center gap-2">
+          <Link href="/new" className={iconButton} aria-label="新規登録">
+            ➕
+          </Link>
+          <Link href="/search" className={iconButton} aria-label="検索">
+            🔍
+          </Link>
+          <Link href="/account" className={iconButton} aria-label="アカウント">
+            👤
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
     </header>
   );
