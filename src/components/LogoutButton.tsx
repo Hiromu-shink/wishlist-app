@@ -4,8 +4,15 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const buttonWhite = "h-10 px-4 py-2 border rounded text-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60";
+const menuButton = "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60";
 
-export function LogoutButton() {
+type LogoutButtonProps = {
+  className?: string;
+  variant?: 'default' | 'menu';
+  onComplete?: () => void;
+};
+
+export function LogoutButton({ className, variant = 'default', onComplete }: LogoutButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -15,6 +22,7 @@ export function LogoutButton() {
       await fetch('/api/logout', { method: 'POST' });
       router.push('/login');
       router.refresh();
+      onComplete?.();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -22,11 +30,13 @@ export function LogoutButton() {
     }
   }
 
+  const baseClass = variant === 'menu' ? menuButton : buttonWhite;
+
   return (
     <button
       onClick={handleLogout}
       disabled={loading}
-      className={buttonWhite}
+      className={className ? `${baseClass} ${className}` : baseClass}
     >
       {loading ? 'ログアウト中...' : 'ログアウト'}
     </button>
