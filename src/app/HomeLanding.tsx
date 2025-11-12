@@ -61,7 +61,7 @@ export async function HomeLanding() {
   const [{ data: currentItems }, { data: somedayItems }, { data: purchasedItems }, { data: allItems }] = await Promise.all([
     supabase.from("wishlist").select("*").eq("month", month),
     supabase.from("wishlist").select("*").eq("month", "someday"),
-    supabase.from("wishlist").select("*").eq("is_purchased", true),
+    supabase.from("wishlist").select("*").eq("is_purchased", true).neq("month", "someday"),
     supabase.from("wishlist").select("price, is_purchased, month"),
   ]);
 
