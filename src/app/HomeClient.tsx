@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getWishlistItems } from "@/app/actions/wishlist";
@@ -25,6 +26,7 @@ export function HomeClient() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const defaultMonth = useMemo(() => currentMonth(), []);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -80,37 +82,49 @@ export function HomeClient() {
     <div className="mx-auto max-w-6xl p-6 space-y-6">
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex-shrink-0 w-[150px] text-left">
-            {isTouchDevice && !isSomeday ? (
-              <>
-                <input
-                  type="month"
-                  className={`${buttonBase} w-full`}
-                  value={month}
-                  min="2025-01"
-                  max="2074-12"
-                  list="month-options"
-                  onChange={(e) => handleMonthChange(e.target.value)}
-                />
-                <datalist id="month-options">
-                  {monthOptions.map((option) => (
-                    <option value={option} key={option} />
-                  ))}
-                </datalist>
-              </>
+          <div className="flex items-center gap-2">
+            <div className="flex-shrink-0 w-[150px] text-left">
+              {!isSomeday ? (
+                isTouchDevice ? (
+                  <>
+                    <input
+                      type="month"
+                      className={`${buttonBase} w-full`}
+                      value={month}
+                      min="2025-01"
+                      max="2074-12"
+                      list="month-options"
+                      onChange={(e) => handleMonthChange(e.target.value)}
+                    />
+                    <datalist id="month-options">
+                      {monthOptions.map((option) => (
+                        <option value={option} key={option} />
+                      ))}
+                    </datalist>
+                  </>
+                ) : (
+                  <input
+                    type="month"
+                    className={`${buttonBase} w-full`}
+                    value={month}
+                    min="2025-01"
+                    max="2074-12"
+                    list="month-options-desktop"
+                    onChange={(e) => handleMonthChange(e.target.value)}
+                  />
+                )
+              ) : (
+                <div className={`${buttonBase} w-full bg-gray-50 text-center text-gray-600`}>いつか欲しいもの</div>
+              )}
+            </div>
+            {!isSomeday ? (
+              <Link href="/month?month=someday" className={`${buttonBase} whitespace-nowrap`}>
+                いつかリスト
+              </Link>
             ) : (
-              <select
-                className={`${buttonBase} w-full`}
-                value={month}
-                onChange={(e) => handleMonthChange(e.target.value)}
-              >
-                <option value="someday">いつか欲しいもの</option>
-                {monthOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <Link href={`/month?month=${defaultMonth}`} className={`${buttonBase} whitespace-nowrap`}>
+                月リストへ
+              </Link>
             )}
           </div>
           <div className="flex-shrink-0 w-[150px] text-right">
@@ -121,6 +135,13 @@ export function HomeClient() {
             />
           </div>
         </div>
+        {!isSomeday && (
+          <datalist id="month-options-desktop">
+            {monthOptions.map((option) => (
+              <option value={option} key={option} />
+            ))}
+          </datalist>
+        )}
       </header>
       {!isSomeday && (
         <div className="flex items-center justify-between text-sm text-gray-700">
