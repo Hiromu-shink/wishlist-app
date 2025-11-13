@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { createSupabaseServerAnon } from "@/lib/supabase/server";
 import type { WishlistItem } from "@/types/wishlist";
 
@@ -39,17 +40,26 @@ function pickCurrentHighlight(items: WishlistItem[]): WishlistItem | null {
   return pickRandom(items);
 }
 
-function Card({ title, description, footer, href }: { title: string; description: React.ReactNode; footer?: React.ReactNode; href: string }) {
+function Card({ title, description, footer, href, imageUrl }: { title: string; description: ReactNode; footer?: ReactNode; href: string; imageUrl?: string | null }) {
   return (
     <Link
       href={href}
-      className="flex h-full flex-col justify-between rounded-xl border border-[#dddddd] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group aspect-square overflow-hidden rounded-xl border border-[#dddddd] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="space-y-2">
+      <div className="flex h-full flex-col p-4">
         <h3 className="text-lg font-semibold text-[#333]">{title}</h3>
-        <div className="text-sm text-[#555] space-y-1">{description}</div>
+        <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-lg bg-[#f0f0f0]">
+          {imageUrl ? (
+            <img src={imageUrl} alt={title} className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-[1.02]" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">No Image</div>
+          )}
+        </div>
+        <div className="mt-3 flex-1 overflow-hidden text-sm text-[#555] space-y-1">
+          {description}
+        </div>
+        {footer && <div className="mt-3 text-xs text-[#777]">{footer}</div>}
       </div>
-      {footer && <div className="mt-4 text-xs text-[#777]">{footer}</div>}
     </Link>
   );
 }
@@ -85,6 +95,7 @@ export async function HomeLanding() {
         <Card
           href={`/month?month=${month}`}
           title="今月の欲しいもの"
+          imageUrl={highlightCurrent?.image_url ?? null}
           description={
             highlightCurrent ? (
               <>
@@ -107,6 +118,7 @@ export async function HomeLanding() {
         <Card
           href="/month?month=someday"
           title="いつか欲しいもの"
+          imageUrl={highlightSomeday?.image_url ?? null}
           description={
             highlightSomeday ? (
               <>
@@ -123,6 +135,7 @@ export async function HomeLanding() {
         <Card
           href="/purchased"
           title="購入済みリスト"
+          imageUrl={highlightPurchased?.image_url ?? null}
           description={
             highlightPurchased ? (
               <>
@@ -139,6 +152,7 @@ export async function HomeLanding() {
         <Card
           href="/stats"
           title="統計・ダッシュボード"
+          imageUrl={null}
           description={
             <>
               <p>全体の合計金額: ¥{totalPrice.toLocaleString()}</p>

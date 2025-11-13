@@ -31,13 +31,13 @@ export function HeaderNav() {
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/" className={iconButton} aria-label="ホーム">
-            <Home className="h-5 w-5" strokeWidth={1.5} />
+            <Home className="h-8 w-8" strokeWidth={1.5} />
           </Link>
           <Link href="/new" className={iconButton} aria-label="新規登録">
-            <Plus className="h-5 w-5" strokeWidth={1.5} />
+            <Plus className="h-8 w-8" strokeWidth={1.5} />
           </Link>
           <Link href="/search" className={iconButton} aria-label="検索">
-            <Search className="h-5 w-5" strokeWidth={1.5} />
+            <Search className="h-8 w-8" strokeWidth={1.5} />
           </Link>
           <div className="relative" ref={menuRef}>
             <button
@@ -48,7 +48,7 @@ export function HeaderNav() {
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((prev) => !prev)}
             >
-              <User className="h-5 w-5" strokeWidth={1.5} />
+              <User className="h-8 w-8" strokeWidth={1.5} />
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
