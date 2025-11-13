@@ -2,15 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Home, Plus, Search, User } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
-const iconButton = `${buttonBase} bg-white hover:bg-gray-50 flex items-center justify-center w-10 filter grayscale`;
-
-const HOME_ICON = "🏠\uFE0E";
-const PLUS_ICON = "➕\uFE0E";
-const SEARCH_ICON = "🔍\uFE0E";
-const ACCOUNT_ICON = "👤\uFE0E";
+const iconButton = `${buttonBase} bg-white hover:bg-gray-50 flex items-center justify-center w-10 text-gray-800`;
 
 export function HeaderNav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,13 +31,13 @@ export function HeaderNav() {
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/" className={iconButton} aria-label="ホーム">
-            {HOME_ICON}
+            <Home className="h-5 w-5" strokeWidth={1.5} />
           </Link>
           <Link href="/new" className={iconButton} aria-label="新規登録">
-            {PLUS_ICON}
+            <Plus className="h-5 w-5" strokeWidth={1.5} />
           </Link>
           <Link href="/search" className={iconButton} aria-label="検索">
-            {SEARCH_ICON}
+            <Search className="h-5 w-5" strokeWidth={1.5} />
           </Link>
           <div className="relative" ref={menuRef}>
             <button
@@ -52,7 +48,7 @@ export function HeaderNav() {
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((prev) => !prev)}
             >
-              {ACCOUNT_ICON}
+              <User className="h-5 w-5" strokeWidth={1.5} />
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
