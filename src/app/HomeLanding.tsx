@@ -30,9 +30,8 @@ function pickCurrentHighlight(items: WishlistItem[]): WishlistItem | null {
       if (Number.isNaN(date.getTime())) return false;
       const diff = (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
       return diff >= 0 && diff <= 7;
-    })
-    .sort((a, b) => new Date(a.deadline as string).getTime() - new Date(b.deadline as string).getTime());
-  if (soon.length) return soon[0];
+    });
+  if (soon.length) return pickRandom(soon);
 
   const highPriority = items.filter((item) => item.priority >= 4);
   if (highPriority.length) return pickRandom(highPriority);
@@ -40,10 +39,12 @@ function pickCurrentHighlight(items: WishlistItem[]): WishlistItem | null {
   return pickRandom(items);
 }
 
-function Card({ title, description, footer, href, imageUrl }: { title: string; description: ReactNode; footer?: ReactNode; href: string; imageUrl?: string | null }) {
+function Card({ title, description, footer, href, imageUrl, hideContent = false, ariaDescription }: { title: string; description: ReactNode; footer?: ReactNode; href: string; imageUrl?: string | null; hideContent?: boolean; ariaDescription?: string }) {
+  const label = ariaDescription ? `${title}: ${ariaDescription}` : title;
   return (
     <Link
       href={href}
+      aria-label={label}
       className="group aspect-square overflow-hidden rounded-xl border border-[#dddddd] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex h-full flex-col p-4">
@@ -55,10 +56,14 @@ function Card({ title, description, footer, href, imageUrl }: { title: string; d
             <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">No Image</div>
           )}
         </div>
-        <div className="mt-3 flex-1 overflow-hidden text-sm text-[#555] space-y-1">
-          {description}
-        </div>
-        {footer && <div className="mt-3 text-xs text-[#777]">{footer}</div>}
+        {!hideContent && (
+          <>
+            <div className="mt-3 flex-1 overflow-hidden text-sm text-[#555] space-y-1">
+              {description}
+            </div>
+            {footer && <div className="mt-3 text-xs text-[#777]">{footer}</div>}
+          </>
+        )}
       </div>
     </Link>
   );
@@ -96,6 +101,12 @@ export async function HomeLanding() {
           href={`/month?month=${month}`}
           title="今月の欲しいもの"
           imageUrl={highlightCurrent?.image_url ?? null}
+          hideContent
+          ariaDescription={
+            highlightCurrent
+              ? `${highlightCurrent.name ?? ""} ${highlightCurrent.price ? `価格 ¥${Number(highlightCurrent.price).toLocaleString()}` : ""}`.trim()
+              : "今月のアイテムがありません"
+          }
           description={
             highlightCurrent ? (
               <>
@@ -119,6 +130,12 @@ export async function HomeLanding() {
           href="/month?month=someday"
           title="いつか欲しいもの"
           imageUrl={highlightSomeday?.image_url ?? null}
+          hideContent
+          ariaDescription={
+            highlightSomeday
+              ? `${highlightSomeday.name ?? ""} ${highlightSomeday.price ? `価格 ¥${Number(highlightSomeday.price).toLocaleString()}` : ""}`.trim()
+              : "いつか欲しいリストは空です"
+          }
           description={
             highlightSomeday ? (
               <>
@@ -136,6 +153,12 @@ export async function HomeLanding() {
           href="/purchased"
           title="購入済みリスト"
           imageUrl={highlightPurchased?.image_url ?? null}
+          hideContent
+          ariaDescription={
+            highlightPurchased
+              ? `${highlightPurchased.name ?? ""} ${highlightPurchased.price ? `価格 ¥${Number(highlightPurchased.price).toLocaleString()}` : ""}`.trim()
+              : "まだ購入済みアイテムがありません"
+          }
           description={
             highlightPurchased ? (
               <>
@@ -153,6 +176,7 @@ export async function HomeLanding() {
           href="/stats"
           title="統計・ダッシュボード"
           imageUrl={null}
+          ariaDescription={`全体の合計金額 ¥${totalPrice.toLocaleString()}、全体のアイテム数 ${totalCount}`}
           description={
             <>
               <p>全体の合計金額: ¥{totalPrice.toLocaleString()}</p>
