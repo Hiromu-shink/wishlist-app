@@ -65,7 +65,7 @@ export default function ItemDetailPage() {
     };
   }, [file]);
 
-  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : item?.image_url ?? null);
+  const displayImage = uploadedPreview ?? metadataImageUrl ?? (form.image_url ? form.image_url : null);
 
   useEffect(() => {
     if (form.is_purchased && !form.purchased_date) {
@@ -91,6 +91,9 @@ export default function ItemDetailPage() {
           purchased_date: data.purchased_date || "",
           is_someday: data.is_someday || false,
         });
+        setMetadataImageUrl(null);
+        setFile(null);
+        setUploadedPreview(null);
       } catch (error: any) {
         push(error.message || "アイテムの取得に失敗しました");
         router.push("/");
@@ -119,10 +122,18 @@ export default function ItemDetailPage() {
         price: price !== null ? String(price) : prev.price,
         image_url: imageUrl ?? prev.image_url,
       }));
+      setMetadataImageUrl(imageUrl ?? null);
       if (!title && price === null && !imageUrl) {
         setMetadataError("情報が見つかりませんでした");
       }
     });
+  }
+
+  function handleClearImage() {
+    setFile(null);
+    setUploadedPreview(null);
+    setMetadataImageUrl(null);
+    setForm((prev) => ({ ...prev, image_url: "" }));
   }
 
   async function handleUpdate() {
@@ -153,7 +164,7 @@ export default function ItemDetailPage() {
           name: form.name,
           price: form.price ? Number(form.price) : null,
           url: form.url || null,
-          image_url: uploadedUrl || (form.image_url || null),
+          image_url: uploadedUrl ?? (metadataImageUrl ?? (form.image_url ? form.image_url : null)),
           comment: form.comment || null,
           deadline: isSomeday ? null : (form.deadline || null),
           priority: form.priority,
@@ -167,7 +178,23 @@ export default function ItemDetailPage() {
         router.refresh();
         // データを再取得
         const data = await getWishlistItemById(id);
-        setItem(data as WishlistItem);
+        const refreshed = data as WishlistItem;
+        setItem(refreshed);
+        setForm({
+          name: refreshed.name || "",
+          price: refreshed.price ? String(refreshed.price) : "",
+          url: refreshed.url || "",
+          image_url: refreshed.image_url || "",
+          comment: refreshed.comment || "",
+          deadline: refreshed.deadline || "",
+          priority: refreshed.priority || 3,
+          is_purchased: refreshed.is_purchased || false,
+          purchased_date: refreshed.purchased_date || "",
+          is_someday: refreshed.is_someday || false,
+        });
+        setMetadataImageUrl(null);
+        setFile(null);
+        setUploadedPreview(null);
       } catch (error: any) {
         push(error.message || "更新に失敗しました");
       }
@@ -352,11 +379,9 @@ export default function ItemDetailPage() {
                   <div className="relative w-48 h-48 overflow-hidden rounded border bg-gray-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={displayImage} alt="プレビュー" className="h-full w-full object-cover object-center" />
-                    {uploadedPreview && (
-                      <button type="button" className={removeBadge} onClick={() => setFile(null)}>
-                        ×
-                      </button>
-                    )}
+                    <button type="button" className={removeBadge} onClick={handleClearImage}>
+                      ×
+                    </button>
                   </div>
                 ) : (
                   <div className="flex h-48 w-48 items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50 text-xs text-gray-500">
@@ -385,6 +410,9 @@ export default function ItemDetailPage() {
                 </div>
                 {metadataImageUrl && !uploadedPreview && (
                   <p className="text-xs text-gray-500">OGP 画像を使用中</p>
+                )}
+                {!metadataImageUrl && !uploadedPreview && form.image_url && (
+                  <p className="text-xs text-gray-500">既存の画像を使用中</p>
                 )}
               </div>
             </div>

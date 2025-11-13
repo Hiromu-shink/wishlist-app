@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { randomInt } from "crypto";
 import { createSupabaseServerAnon } from "@/lib/supabase/server";
 import type { WishlistItem } from "@/types/wishlist";
 
@@ -17,7 +18,8 @@ function formatDate(value?: string | null) {
 
 function pickRandom<T>(items: T[]): T | null {
   if (!items.length) return null;
-  return items[Math.floor(Math.random() * items.length)] ?? null;
+  const index = randomInt(items.length);
+  return items[index] ?? null;
 }
 
 function pickCurrentHighlight(items: WishlistItem[]): WishlistItem | null {

@@ -63,7 +63,7 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
     }
   }
 
-  const { error } = await supabase.from("wishlist").insert({
+  const { data, error } = await supabase.from("wishlist").insert({
     user_id: null,
     name: parsed.name,
     price: normalizePrice(parsed.price ?? null),
@@ -76,9 +76,10 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
     purchased_date: normalizeDate(parsed.purchased_date ?? null),
     month: parsed.is_someday ? "someday" : month,
     is_someday: parsed.is_someday ?? false,
-  });
+  }).select("id, month, is_someday").single();
   if (error) throw error;
   revalidatePath("/");
+  return data;
 }
 
 export async function deleteWishlistItem(id: string) {

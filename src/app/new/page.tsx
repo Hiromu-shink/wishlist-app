@@ -13,6 +13,11 @@ const buttonBlack = `${buttonBase} bg-black text-white hover:bg-gray-800`;
 const inputBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
 const removeBadge = "absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-xs font-semibold text-gray-600 shadow";
 
+function currentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
 const schema = z.object({
   name: z.string().min(1, "必須です"),
   price: z.string().optional(),
@@ -130,7 +135,7 @@ export default function NewPage() {
             return;
           }
         }
-        await createWishlistItem({
+        const created = await createWishlistItem({
           name: form.name,
           price: form.price ? Number(form.price) : null,
           url: form.url || null,
@@ -142,7 +147,9 @@ export default function NewPage() {
           purchased_date: form.is_purchased ? (form.purchased_date || null) : null,
           is_someday: form.is_someday,
         });
-        router.push("/");
+        const targetMonth = created?.is_someday ? "someday" : created?.month ?? currentMonth();
+        router.push(`/month?month=${targetMonth}`);
+        router.refresh();
       } catch (err: any) {
         setError(err.message ?? "登録に失敗しました");
       }

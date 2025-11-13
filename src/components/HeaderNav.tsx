@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
 const iconButton = `${buttonBase} bg-white hover:bg-gray-50 flex items-center justify-center w-12 text-gray-800`;
+const menuItem = "block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset";
 
 export function HeaderNav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,10 +52,17 @@ export function HeaderNav() {
               <User className="h-9 w-9" strokeWidth={1.5} />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-40 rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
+              <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
+                <Link
+                  href="/month?month=someday"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  いつか欲しいリスト
+                </Link>
                 <LogoutButton
                   variant="menu"
-                  className="rounded-lg"
+                  className="border-t text-left"
                   onComplete={() => setMenuOpen(false)}
                 />
               </div>
