@@ -38,6 +38,7 @@ export function HomeClient() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
   const mobileInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingMobileMonth, setPendingMobileMonth] = useState<string | null>(null);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -117,35 +118,35 @@ export function HomeClient() {
     <div className="relative" ref={pickerRef}>
       <button
         type="button"
-        className={`${buttonBase} w-full flex items-center justify-between gap-2`}
+        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
         onClick={() => setPickerOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={pickerOpen}
       >
-        <span className="text-base font-semibold">{pickerYear}</span>
-        <span className="text-xs text-gray-500">▾▴</span>
+        <span className="text-base tracking-wide">{pickerYear}</span>
+        <span className="text-base text-gray-700">▼</span>
       </button>
       {pickerOpen && (
         <div className="absolute left-0 z-40 mt-2 w-56 rounded-xl border bg-white p-3 shadow-xl">
           <div className="mb-3 flex items-center justify-between gap-2">
             <button
               type="button"
-              className="rounded px-3 py-1 text-sm hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-1 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
             >
-              ▾
+              ▼
             </button>
             <div className="text-lg font-semibold text-gray-900">{pickerYear}</div>
             <button
               type="button"
-              className="rounded px-3 py-1 text-sm hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-1 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
             >
-              ▴
+              ▲
             </button>
           </div>
           <div className="grid grid-cols-4 gap-2 text-center text-sm text-gray-800">
@@ -165,7 +166,7 @@ export function HomeClient() {
                     isSelected ? "bg-black text-white" : "hover:bg-gray-100"
                   }`}
                 >
-                  {monthNumber.toString().padStart(2, "0")}
+                  {monthNumber}
                 </button>
               );
             })}
@@ -185,7 +186,7 @@ export function HomeClient() {
     <div className="relative">
       <button
         type="button"
-        className={`${buttonBase} w-full flex items-center justify-between gap-2`}
+        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
         onClick={() => {
           const input = mobileInputRef.current;
           if (!input) return;
@@ -196,8 +197,8 @@ export function HomeClient() {
           }
         }}
       >
-        <span className="text-base font-semibold">{mobileDisplayedYear}</span>
-        <span className="text-xs text-gray-500">▾▴</span>
+        <span className="text-base tracking-wide">{mobileDisplayedYear}</span>
+        <span className="text-base text-gray-700">▼</span>
       </button>
       <input
         ref={mobileInputRef}
@@ -208,8 +209,17 @@ export function HomeClient() {
         max="2074-12"
         aria-label="年月を選択"
         onChange={(e) => {
-          if (e.target.value) {
+          if (!e.target.value) return;
+          if (isSomeday) {
+            setPendingMobileMonth(e.target.value);
+          } else {
             handleMonthChange(e.target.value);
+          }
+        }}
+        onBlur={() => {
+          if (isSomeday && pendingMobileMonth) {
+            handleMonthChange(pendingMobileMonth);
+            setPendingMobileMonth(null);
           }
         }}
       />
