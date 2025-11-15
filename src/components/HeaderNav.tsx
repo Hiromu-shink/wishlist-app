@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Home, Plus, Search, User } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
@@ -10,8 +11,13 @@ const iconButton = `${buttonBase} bg-white hover:bg-gray-50 flex items-center ju
 const menuItem = "block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset";
 
 export function HeaderNav() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  if (pathname === "/login") {
+    return null;
+  }
 
   useEffect(() => {
     if (!menuOpen) return;

@@ -88,10 +88,13 @@ export function HomeClient() {
                   <input
                     type="month"
                     className={`${buttonBase} w-full`}
-                    value={isSomeday ? fallbackMonth : month}
+                    value={isSomeday ? "" : month}
                     min="2025-01"
                     max="2074-12"
                     list="month-options"
+                    placeholder="年月"
+                    aria-label="年月を選択"
+                    title="年月を選択"
                     onChange={(e) => handleMonthChange(e.target.value)}
                   />
                   <datalist id="month-options">
@@ -105,10 +108,13 @@ export function HomeClient() {
                   <input
                     type="month"
                     className={`${buttonBase} w-full`}
-                    value={isSomeday ? fallbackMonth : month}
+                    value={isSomeday ? "" : month}
                     min="2025-01"
                     max="2074-12"
                     list="month-options-desktop"
+                    placeholder="年月"
+                    aria-label="年月を選択"
+                    title="年月を選択"
                     onChange={(e) => handleMonthChange(e.target.value)}
                   />
                   <datalist id="month-options-desktop">
@@ -117,9 +123,6 @@ export function HomeClient() {
                     ))}
                   </datalist>
                 </>
-              )}
-              {isSomeday && (
-                <p className="mt-1 text-xs text-gray-500">現在: いつか欲しいものリスト</p>
               )}
             </div>
           </div>
