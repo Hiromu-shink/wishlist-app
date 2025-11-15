@@ -39,6 +39,11 @@ export function HomeClient() {
   const pickerRef = useRef<HTMLDivElement | null>(null);
   const mobileInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingMobileMonth, setPendingMobileMonth] = useState<string | null>(null);
+  const [pickerMonth, setPickerMonth] = useState(() => {
+    const source = isSomeday ? fallbackMonth : month;
+    const m = Number(source.split("-")[1]);
+    return Number.isFinite(m) ? m : 1;
+  });
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -54,13 +59,21 @@ export function HomeClient() {
 
   useEffect(() => {
     const source = isSomeday ? fallbackMonth : month;
-    if (!source.includes("-")) return;
-    const y = Number(source.split("-")[0]);
+    const [yStr, mStr] = source.split("-");
+    const y = Number(yStr);
+    const m = Number(mStr);
     if (Number.isFinite(y)) {
       setPickerYear(() => {
         if (y < startYear) return startYear;
         if (y > endYear) return endYear;
         return y;
+      });
+    }
+    if (Number.isFinite(m)) {
+      setPickerMonth(() => {
+        if (m < 1) return 1;
+        if (m > 12) return 12;
+        return m;
       });
     }
   }, [month, isSomeday, fallbackMonth]);
@@ -127,11 +140,11 @@ export function HomeClient() {
         <span className="text-base text-gray-700">▼</span>
       </button>
       {pickerOpen && (
-        <div className="absolute left-0 z-40 mt-2 w-56 rounded-xl border bg-white p-3 shadow-xl">
-          <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="absolute left-0 z-40 mt-2 w-64 rounded-xl border bg-white p-4 shadow-xl space-y-3">
+          <div className="flex items-center justify-between gap-4">
             <button
               type="button"
-              className="rounded px-3 py-1 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
@@ -141,7 +154,7 @@ export function HomeClient() {
             <div className="text-lg font-semibold text-gray-900">{pickerYear}</div>
             <button
               type="button"
-              className="rounded px-3 py-1 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
@@ -149,27 +162,68 @@ export function HomeClient() {
               ▲
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2 text-center text-sm text-gray-800">
-            {Array.from({ length: 12 }).map((_, idx) => {
-              const monthNumber = idx + 1;
-              const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
-              const isSelected = !isSomeday && month === monthValue;
-              return (
-                <button
-                  type="button"
-                  key={monthValue}
-                  onClick={() => {
-                    handleMonthChange(monthValue);
-                    setPickerOpen(false);
-                  }}
-                  className={`rounded px-2 py-2 font-semibold ${
-                    isSelected ? "bg-black text-white" : "hover:bg-gray-100"
-                  }`}
-                >
-                  {monthNumber}
-                </button>
-              );
-            })}
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              onClick={() => {
+                setPickerMonth((prev) => {
+                  if (prev === 1) {
+                    if (pickerYear > startYear) {
+                      setPickerYear((year) => Math.max(startYear, year - 1));
+                      return 12;
+                    }
+                    return prev;
+                  }
+                  return prev - 1;
+                });
+              }}
+              disabled={pickerYear === startYear && pickerMonth === 1}
+              aria-label="前の月へ"
+            >
+              ◀
+            </button>
+            <div className="text-lg font-semibold text-gray-900">{pickerMonth}</div>
+            <button
+              type="button"
+              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              onClick={() => {
+                setPickerMonth((prev) => {
+                  if (prev === 12) {
+                    if (pickerYear < endYear) {
+                      setPickerYear((year) => Math.min(endYear, year + 1));
+                      return 1;
+                    }
+                    return prev;
+                  }
+                  return prev + 1;
+                });
+              }}
+              disabled={pickerYear === endYear && pickerMonth === 12}
+              aria-label="次の月へ"
+            >
+              ▶
+            </button>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              className={`${buttonBase} bg-white hover:bg-gray-50`}
+              onClick={() => setPickerOpen(false)}
+            >
+              キャンセル
+            </button>
+            <button
+              type="button"
+              className={`${buttonBase} bg-black text-white hover:bg-gray-800`}
+              onClick={() => {
+                const target = `${pickerYear}-${String(pickerMonth).padStart(2, "0")}`;
+                handleMonthChange(target);
+                setPickerOpen(false);
+              }}
+            >
+              決定
+            </button>
           </div>
         </div>
       )}
