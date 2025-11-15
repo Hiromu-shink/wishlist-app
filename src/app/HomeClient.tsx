@@ -149,7 +149,7 @@ export function HomeClient() {
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
             >
-              ▼
+              ◀
             </button>
             <div className="text-lg font-semibold text-gray-900">{pickerYear}</div>
             <button
@@ -159,51 +159,27 @@ export function HomeClient() {
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
             >
-              ▲
-            </button>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
-              onClick={() => {
-                setPickerMonth((prev) => {
-                  if (prev === 1) {
-                    if (pickerYear > startYear) {
-                      setPickerYear((year) => Math.max(startYear, year - 1));
-                      return 12;
-                    }
-                    return prev;
-                  }
-                  return prev - 1;
-                });
-              }}
-              disabled={pickerYear === startYear && pickerMonth === 1}
-              aria-label="前の月へ"
-            >
-              ◀
-            </button>
-            <div className="text-lg font-semibold text-gray-900">{pickerMonth}</div>
-            <button
-              type="button"
-              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
-              onClick={() => {
-                setPickerMonth((prev) => {
-                  if (prev === 12) {
-                    if (pickerYear < endYear) {
-                      setPickerYear((year) => Math.min(endYear, year + 1));
-                      return 1;
-                    }
-                    return prev;
-                  }
-                  return prev + 1;
-                });
-              }}
-              disabled={pickerYear === endYear && pickerMonth === 12}
-              aria-label="次の月へ"
-            >
               ▶
             </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {Array.from({ length: 12 }).map((_, idx) => {
+              const monthNumber = idx + 1;
+              const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
+              const isSelected = pickerMonth === monthNumber;
+              return (
+                <button
+                  type="button"
+                  key={monthValue}
+                  onClick={() => setPickerMonth(monthNumber)}
+                  className={`rounded px-2 py-2 text-xs font-semibold ${
+                    isSelected ? "bg-black text-white" : "hover:bg-gray-100"
+                  }`}
+                >
+                  {monthNumber}
+                </button>
+              );
+            })}
           </div>
           <div className="flex justify-end gap-2">
             <button
