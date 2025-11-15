@@ -130,23 +130,25 @@ export function HomeClient() {
           <div className="mb-3 flex items-center justify-between gap-2">
             <button
               type="button"
-              className={`${buttonBase} w-16 py-1 text-sm`}
-              onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
-              disabled={pickerYear >= endYear}
+              className="rounded px-3 py-1 text-sm hover:bg-gray-100 disabled:text-gray-400"
+              onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
+              disabled={pickerYear <= startYear}
+              aria-label="前年へ"
             >
               ▾
             </button>
-            <div className="text-lg font-semibold">{pickerYear}</div>
+            <div className="text-lg font-semibold text-gray-900">{pickerYear}</div>
             <button
               type="button"
-              className={`${buttonBase} w-16 py-1 text-sm`}
-              onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
-              disabled={pickerYear <= startYear}
+              className="rounded px-3 py-1 text-sm hover:bg-gray-100 disabled:text-gray-400"
+              onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
+              disabled={pickerYear >= endYear}
+              aria-label="翌年へ"
             >
               ▴
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 text-center text-sm text-gray-800">
             {Array.from({ length: 12 }).map((_, idx) => {
               const monthNumber = idx + 1;
               const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
@@ -159,8 +161,8 @@ export function HomeClient() {
                     handleMonthChange(monthValue);
                     setPickerOpen(false);
                   }}
-                  className={`rounded border px-2 py-1 text-sm ${
-                    isSelected ? "bg-black text-white border-black" : "bg-white hover:bg-gray-50"
+                  className={`rounded px-2 py-2 font-semibold ${
+                    isSelected ? "bg-black text-white" : "hover:bg-gray-100"
                   }`}
                 >
                   {monthNumber.toString().padStart(2, "0")}
@@ -173,24 +175,35 @@ export function HomeClient() {
     </div>
   );
 
-  const mobilePicker = isSomeday ? (
+  const mobileDisplayedYear = useMemo(() => {
+    if (isSomeday) return pickerYear;
+    const y = Number(month.split("-")[0]);
+    return Number.isFinite(y) ? y : pickerYear;
+  }, [isSomeday, month, pickerYear]);
+
+  const mobilePicker = (
     <div className="relative">
       <button
         type="button"
         className={`${buttonBase} w-full flex items-center justify-between gap-2`}
         onClick={() => {
-          mobileInputRef.current?.showPicker?.();
-          mobileInputRef.current?.focus();
+          const input = mobileInputRef.current;
+          if (!input) return;
+          if (typeof input.showPicker === "function") {
+            input.showPicker();
+          } else {
+            input.click();
+          }
         }}
       >
-        <span className="text-base font-semibold">{pickerYear}</span>
+        <span className="text-base font-semibold">{mobileDisplayedYear}</span>
         <span className="text-xs text-gray-500">▾▴</span>
       </button>
       <input
         ref={mobileInputRef}
         type="month"
         className="absolute inset-0 h-full w-full opacity-0"
-        value=""
+        value={isSomeday ? "" : month}
         min="2025-01"
         max="2074-12"
         aria-label="年月を選択"
@@ -200,24 +213,6 @@ export function HomeClient() {
           }
         }}
       />
-    </div>
-  ) : (
-    <div className="relative">
-      <input
-        type="month"
-        className={`${buttonBase} w-full`}
-        value={month}
-        min="2025-01"
-        max="2074-12"
-        list="month-options"
-        aria-label="年月を選択"
-        onChange={(e) => handleMonthChange(e.target.value)}
-      />
-      <datalist id="month-options">
-        {monthOptions.map((option) => (
-          <option value={option} key={option} />
-        ))}
-      </datalist>
     </div>
   );
 
