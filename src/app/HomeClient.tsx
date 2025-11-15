@@ -143,7 +143,7 @@ export function HomeClient() {
           <div className="flex items-center justify-between gap-4">
             <button
               type="button"
-              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
@@ -153,7 +153,7 @@ export function HomeClient() {
             <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
             <button
               type="button"
-              className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
+              className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
               onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
