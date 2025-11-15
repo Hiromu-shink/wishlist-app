@@ -181,26 +181,7 @@ export function HomeClient() {
               );
             })}
           </div>
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              className={`${buttonBase} bg-white hover:bg-gray-50`}
-              onClick={() => setPickerOpen(false)}
-            >
-              キャンセル
-            </button>
-            <button
-              type="button"
-              className={`${buttonBase} bg-black text-white hover:bg-gray-800`}
-              onClick={() => {
-                const target = `${pickerYear}-${String(pickerMonth).padStart(2, "0")}`;
-                handleMonthChange(target);
-                setPickerOpen(false);
-              }}
-            >
-              決定
-            </button>
-          </div>
+          <div className="text-right text-xs text-gray-400">クリックで月を確定します</div>
         </div>
       )}
     </div>
