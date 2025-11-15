@@ -134,7 +134,7 @@ export function HomeClient() {
               onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
               disabled={pickerYear >= endYear}
             >
-              ▲
+              ▾
             </button>
             <div className="text-lg font-semibold">{pickerYear}</div>
             <button
@@ -143,7 +143,7 @@ export function HomeClient() {
               onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
               disabled={pickerYear <= startYear}
             >
-              ▼
+              ▴
             </button>
           </div>
           <div className="grid grid-cols-4 gap-2">

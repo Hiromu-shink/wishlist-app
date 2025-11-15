@@ -39,6 +39,15 @@ function normalizePrice(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function ensureHttps(url?: string | null) {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (trimmed.toLowerCase().startsWith("http://")) {
+    return trimmed.replace(/^http:\/\//i, "https://");
+  }
+  return trimmed;
+}
+
 export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
   const supabase = createSupabaseServerAnon();
 
@@ -62,6 +71,7 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
       // 失敗しても無視
     }
   }
+  imageUrl = ensureHttps(imageUrl);
 
   const { data, error } = await supabase.from("wishlist").insert({
     user_id: null,
@@ -104,6 +114,9 @@ export async function updateWishlistItem(id: string, values: Partial<z.infer<typ
   const payload: any = { ...values };
   if (Object.prototype.hasOwnProperty.call(payload, 'price')) {
     payload.price = normalizePrice(payload.price);
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "image_url")) {
+    payload.image_url = ensureHttps(payload.image_url);
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'deadline')) {
     payload.deadline = normalizeDate(payload.deadline);
