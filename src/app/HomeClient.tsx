@@ -127,10 +127,10 @@ export function HomeClient() {
   }
 
   const desktopPicker = (
-    <div className="relative w-[180px]" ref={pickerRef}>
+    <div className="relative w-full" ref={pickerRef}>
       <button
         type="button"
-        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold rounded-[12px] border-2`}
+        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
         onClick={() => setPickerOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={pickerOpen}
@@ -150,7 +150,7 @@ export function HomeClient() {
             >
               ◀
             </button>
-            <div className="text-lg font-semibold text-gray-900">{pickerYear}</div>
+            <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
             <button
               type="button"
               className="rounded px-3 py-2 text-lg font-semibold hover:bg-gray-100 disabled:text-gray-400"
