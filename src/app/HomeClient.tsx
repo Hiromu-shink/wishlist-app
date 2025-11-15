@@ -127,10 +127,10 @@ export function HomeClient() {
   }
 
   const desktopPicker = (
-    <div className="relative" ref={pickerRef}>
+    <div className="relative w-[180px]" ref={pickerRef}>
       <button
         type="button"
-        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
+        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold rounded-[12px] border-2`}
         onClick={() => setPickerOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={pickerOpen}
@@ -139,7 +139,7 @@ export function HomeClient() {
         <span className="text-base text-gray-700">▼</span>
       </button>
       {pickerOpen && (
-        <div className="absolute left-0 z-40 mt-2 w-64 rounded-xl border bg-white p-4 shadow-xl space-y-3">
+        <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
           <div className="flex items-center justify-between gap-4">
             <button
               type="button"
