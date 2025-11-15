@@ -37,6 +37,7 @@ export function HomeClient() {
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
+  const mobileInputRef = useRef<HTMLInputElement | null>(null);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -130,8 +131,8 @@ export function HomeClient() {
             <button
               type="button"
               className={`${buttonBase} w-16 py-1 text-sm`}
-              onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
-              disabled={pickerYear <= startYear}
+              onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
+              disabled={pickerYear >= endYear}
             >
               ▲
             </button>
@@ -139,8 +140,8 @@ export function HomeClient() {
             <button
               type="button"
               className={`${buttonBase} w-16 py-1 text-sm`}
-              onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
-              disabled={pickerYear >= endYear}
+              onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
+              disabled={pickerYear <= startYear}
             >
               ▼
             </button>
@@ -172,23 +173,46 @@ export function HomeClient() {
     </div>
   );
 
-  const mobilePicker = (
+  const mobilePicker = isSomeday ? (
+    <div className="relative">
+      <button
+        type="button"
+        className={`${buttonBase} w-full flex items-center justify-between gap-2`}
+        onClick={() => {
+          mobileInputRef.current?.showPicker?.();
+          mobileInputRef.current?.focus();
+        }}
+      >
+        <span className="text-base font-semibold">{pickerYear}</span>
+        <span className="text-xs text-gray-500">▾▴</span>
+      </button>
+      <input
+        ref={mobileInputRef}
+        type="month"
+        className="absolute inset-0 h-full w-full opacity-0"
+        value=""
+        min="2025-01"
+        max="2074-12"
+        aria-label="年月を選択"
+        onChange={(e) => {
+          if (e.target.value) {
+            handleMonthChange(e.target.value);
+          }
+        }}
+      />
+    </div>
+  ) : (
     <div className="relative">
       <input
         type="month"
-        className={`${buttonBase} w-full ${isSomeday ? "text-transparent caret-transparent" : ""}`}
-        value={isSomeday ? "" : month}
+        className={`${buttonBase} w-full`}
+        value={month}
         min="2025-01"
         max="2074-12"
         list="month-options"
         aria-label="年月を選択"
         onChange={(e) => handleMonthChange(e.target.value)}
       />
-      {isSomeday && (
-        <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-gray-500">
-          選択
-        </span>
-      )}
       <datalist id="month-options">
         {monthOptions.map((option) => (
           <option value={option} key={option} />
