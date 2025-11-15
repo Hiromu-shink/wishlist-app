@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getWishlistItems } from "@/app/actions/wishlist";
@@ -181,7 +180,7 @@ export function HomeClient() {
               );
             })}
           </div>
-          <div className="text-right text-xs text-gray-400">クリックで月を確定します</div>
+          
         </div>
       )}
     </div>
