@@ -26,6 +26,8 @@ export function HomeClient() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isMobileMonthOpen, setIsMobileMonthOpen] = useState(false);
+  const lastPickedRef = useRef<string | null>(null);
   const fallbackMonth = useMemo(() => currentMonth(), []);
   const fallbackYear = useMemo(() => Number(fallbackMonth.split("-")[0]), [fallbackMonth]);
   const [pickerYear, setPickerYear] = useState(() => {
@@ -219,10 +221,22 @@ export function HomeClient() {
         min="2025-01"
         max="2074-12"
         aria-label="年月を選択"
+        onFocus={() => {
+          setIsMobileMonthOpen(true);
+          lastPickedRef.current = null;
+        }}
         onChange={(e) => {
-          if (!e.target.value) return;
-          // iOS の場合、change は「完了（Done）」を押したときのみ発火する
-          handleMonthChange(e.target.value);
+          // ここでは遷移しない。完了（Done）で閉じられたタイミングで確定する。
+          lastPickedRef.current = e.target.value || null;
+        }}
+        onBlur={() => {
+          // ピッカーが閉じた。最後に選ばれていた値があればこのタイミングで遷移。
+          setIsMobileMonthOpen(false);
+          const picked = lastPickedRef.current;
+          lastPickedRef.current = null;
+          if (picked) {
+            handleMonthChange(picked);
+          }
         }}
       />
     </div>
