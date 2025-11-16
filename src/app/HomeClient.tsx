@@ -37,7 +37,7 @@ export function HomeClient() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
   const mobileInputRef = useRef<HTMLInputElement | null>(null);
-  const [pendingMobileMonth, setPendingMobileMonth] = useState<string | null>(null);
+  // removed pendingMobileMonth: we will navigate on confirmed change only (no blur navigation)
   const [pickerMonth, setPickerMonth] = useState(() => {
     const source = isSomeday ? fallbackMonth : month;
     const m = Number(source.split("-")[1]);
@@ -220,17 +220,8 @@ export function HomeClient() {
         aria-label="年月を選択"
         onChange={(e) => {
           if (!e.target.value) return;
-          if (isSomeday) {
-            setPendingMobileMonth(e.target.value);
-          } else {
-            handleMonthChange(e.target.value);
-          }
-        }}
-        onBlur={() => {
-          if (isSomeday && pendingMobileMonth) {
-            handleMonthChange(pendingMobileMonth);
-            setPendingMobileMonth(null);
-          }
+          // On iOS, 'change' fires on confirmation (Done). Navigate only here.
+          handleMonthChange(e.target.value);
         }}
       />
     </div>

@@ -9,7 +9,8 @@ export function GoogleAuthButton({ label = "Google でログイン" }: { label?:
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: origin,
+        // Redirect back to our Next.js route handler which calls exchangeCodeForSession
+        redirectTo: origin ? `${origin}/auth/callback` : undefined,
         queryParams: { prompt: "select_account" },
       },
     });
