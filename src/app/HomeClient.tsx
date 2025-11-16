@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getWishlistItems } from "@/app/actions/wishlist";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { SortSelector } from "@/components/SortSelector";
@@ -27,6 +26,7 @@ export function HomeClient() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [mobilePendingMonth, setMobilePendingMonth] = useState<string | null>(null);
   const fallbackMonth = useMemo(() => currentMonth(), []);
   const fallbackYear = useMemo(() => Number(fallbackMonth.split("-")[0]), [fallbackMonth]);
   const [pickerYear, setPickerYear] = useState(() => {
@@ -106,8 +106,10 @@ export function HomeClient() {
     setIsLoading(true);
     startTransition(async () => {
       try {
-        const data = await getWishlistItems(month, sort);
-        setItems(data as WishlistItem[]);
+        const res = await fetch(`/api/wishlist?month=${encodeURIComponent(month)}&sort=${encodeURIComponent(sort)}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`failed: ${res.status}`);
+        const data = await res.json();
+        setItems((data?.items ?? []) as WishlistItem[]);
       } catch (error) {
         console.error("Failed to load items:", error);
         setItems([]);
@@ -200,6 +202,7 @@ export function HomeClient() {
         onClick={() => {
           const input = mobileInputRef.current;
           if (!input) return;
+          setMobilePendingMonth(null);
           if (typeof input.showPicker === "function") {
             input.showPicker();
           } else {
@@ -220,8 +223,12 @@ export function HomeClient() {
         aria-label="年月を選択"
         onChange={(e) => {
           if (!e.target.value) return;
-          // On iOS, 'change' fires on confirmation (Done). Navigate only here.
-          handleMonthChange(e.target.value);
+          if (isSomeday) {
+            // Someday 表示中は即遷移しない。ユーザーの確定操作を待つ。
+            setMobilePendingMonth(e.target.value);
+          } else {
+            handleMonthChange(e.target.value);
+          }
         }}
       />
     </div>
@@ -235,6 +242,18 @@ export function HomeClient() {
             <div className="flex-shrink-0 w-[150px] text-left">
               {isTouchDevice ? mobilePicker : desktopPicker}
             </div>
+            {isSomeday && mobilePendingMonth && (
+              <button
+                type="button"
+                className={`${buttonBase} ml-2`}
+                onClick={() => {
+                  handleMonthChange(mobilePendingMonth);
+                  setMobilePendingMonth(null);
+                }}
+              >
+                この月に移動
+              </button>
+            )}
           </div>
           <div className="flex-shrink-0 w-[150px] text-right">
             <SortSelector
