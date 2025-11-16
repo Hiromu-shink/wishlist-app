@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createSupabaseRSCClient, createSupabaseServerClient } from "@/lib/supabase/server";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { createSupabaseRSCClient } from "@/lib/supabase/server";
+import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +22,7 @@ export default async function LoginPage() {
         <input name="password" type="password" required placeholder="パスワード" className="w-full h-10 px-3 border rounded" />
         <button className="w-full h-10 px-4 py-2 border rounded bg-black text-white">ログイン</button>
       </form>
-      <form action="/api/auth/oauth" method="post">
-        <input type="hidden" name="provider" value="google" />
-        <button className="w-full h-10 px-4 py-2 border rounded">Google でログイン</button>
-      </form>
+      <GoogleAuthButton label="Google でログイン" />
       <p className="text-sm text-gray-600">
         アカウントがない方は <Link className="underline" href="/signup">新規登録</Link>
       </p>
