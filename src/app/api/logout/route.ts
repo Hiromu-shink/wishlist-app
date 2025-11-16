@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { deleteSession } from '@/lib/auth';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST() {
-  await deleteSession();
+  const supabase = await createSupabaseServerClient();
+  await supabase.auth.signOut();
   return NextResponse.json({ success: true });
 }
 

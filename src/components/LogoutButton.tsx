@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { getSupabaseBrowser } from '@/lib/supabase/client';
 
 const buttonWhite = "h-10 px-4 py-2 border rounded text-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60";
 const menuButton = "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60";
@@ -19,7 +20,8 @@ export function LogoutButton({ className, variant = 'default', onComplete }: Log
   async function handleLogout() {
     setLoading(true);
     try {
-      await fetch('/api/logout', { method: 'POST' });
+      const supabase = getSupabaseBrowser();
+      await supabase.auth.signOut();
       router.push('/login');
       router.refresh();
       onComplete?.();

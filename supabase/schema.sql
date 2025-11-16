@@ -1,3 +1,45 @@
+-- Drop and recreate wishlist with RLS for Supabase Auth
+
+DROP TABLE IF EXISTS wishlist CASCADE;
+
+CREATE TABLE wishlist (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  price INTEGER,
+  priority INTEGER DEFAULT 3,
+  url TEXT,
+  image_url TEXT,
+  comment TEXT,
+  deadline DATE,
+  is_someday BOOLEAN DEFAULT FALSE,
+  purchased BOOLEAN DEFAULT FALSE,
+  purchased_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_wishlist_user_id ON wishlist(user_id);
+CREATE INDEX idx_wishlist_deadline ON wishlist(deadline);
+CREATE INDEX idx_wishlist_purchased ON wishlist(purchased);
+
+ALTER TABLE wishlist ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own wishlist"
+  ON wishlist FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own wishlist"
+  ON wishlist FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own wishlist"
+  ON wishlist FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own wishlist"
+  ON wishlist FOR DELETE
+  USING (auth.uid() = user_id);
 create table if not exists public.wishlist (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,

@@ -60,6 +60,13 @@ export function HeaderNav() {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
                 <Link
+                  href="/account"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  アカウント情報
+                </Link>
+                <Link
                   href="/month?month=someday"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}

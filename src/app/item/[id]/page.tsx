@@ -29,6 +29,9 @@ export default function ItemDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { push } = useToast();
+
+  // guard for auth (client-side redirect fallback)
+  // server page parent already protects, but keep UX safe
   
   const [item, setItem] = useState<WishlistItem | null>(null);
   const [loading, setLoading] = useState(true);

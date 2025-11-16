@@ -49,7 +49,9 @@ function ensureHttps(url?: string | null) {
 }
 
 export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
 
   const parsed = inputSchema.parse(values);
   const deadline = normalizeDate(parsed.deadline ?? null);
@@ -74,7 +76,7 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
   imageUrl = ensureHttps(imageUrl);
 
   const { data, error } = await supabase.from("wishlist").insert({
-    user_id: null,
+    user_id: user.id,
     name: parsed.name,
     price: normalizePrice(parsed.price ?? null),
     url: parsed.url ?? null,
@@ -93,7 +95,9 @@ export async function createWishlistItem(values: z.infer<typeof inputSchema>) {
 }
 
 export async function deleteWishlistItem(id: string) {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
   const { error } = await supabase.from("wishlist").delete().eq("id", id);
   if (error) throw error;
   revalidatePath("/");
@@ -110,7 +114,9 @@ export async function togglePurchased(id: string, purchased: boolean, purchased_
 }
 
 export async function updateWishlistItem(id: string, values: Partial<z.infer<typeof inputSchema>>) {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
   const payload: any = { ...values };
   if (Object.prototype.hasOwnProperty.call(payload, 'price')) {
     payload.price = normalizePrice(payload.price);
@@ -139,14 +145,14 @@ export async function updateWishlistItem(id: string, values: Partial<z.infer<typ
 }
 
 export async function getWishlistItemById(id: string) {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   const { data, error } = await supabase.from("wishlist").select("*").eq("id", id).single();
   if (error) throw error;
   return data as any;
 }
 
 export async function getWishlistItems(month: string, sort: string = "created-desc") {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   let query = supabase.from("wishlist").select("*").eq("month", month);
   if (sort === "created-desc" || sort === "created") {
     query = query.order("created_at", { ascending: false });
