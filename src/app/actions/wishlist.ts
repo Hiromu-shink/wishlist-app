@@ -98,17 +98,20 @@ export async function deleteWishlistItem(id: string) {
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
-  const { error } = await supabase.from("wishlist").delete().eq("id", id);
+  const { error } = await supabase.from("wishlist").delete().eq("id", id).eq("user_id", user.id);
   if (error) throw error;
   revalidatePath("/");
 }
 
 export async function togglePurchased(id: string, purchased: boolean, purchased_date?: string | null) {
-  const supabase = createSupabaseServerAnon();
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
   const { error } = await supabase
     .from("wishlist")
     .update({ is_purchased: purchased, purchased_date: purchased ? (purchased_date ?? new Date().toISOString().slice(0, 10)) : null })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) throw error;
   revalidatePath("/");
 }
@@ -139,21 +142,25 @@ export async function updateWishlistItem(id: string, values: Partial<z.infer<typ
       payload.month = calcMonth(payload.deadline ?? null);
     }
   }
-  const { error } = await supabase.from("wishlist").update(payload).eq("id", id);
+  const { error } = await supabase.from("wishlist").update(payload).eq("id", id).eq("user_id", user.id);
   if (error) throw error;
   revalidatePath("/");
 }
 
 export async function getWishlistItemById(id: string) {
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
-  const { data, error } = await supabase.from("wishlist").select("*").eq("id", id).single();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+  const { data, error } = await supabase.from("wishlist").select("*").eq("id", id).eq("user_id", user.id).single();
   if (error) throw error;
   return data as any;
 }
 
 export async function getWishlistItems(month: string, sort: string = "created-desc") {
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
-  let query = supabase.from("wishlist").select("*").eq("month", month);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+  let query = supabase.from("wishlist").select("*").eq("month", month).eq("user_id", user.id);
   if (sort === "created-desc" || sort === "created") {
     query = query.order("created_at", { ascending: false });
   }
@@ -207,8 +214,10 @@ export async function getWishlistItems(month: string, sort: string = "created-de
 }
 
 export async function getSomedayItems() {
-  const supabase = createSupabaseServerAnon();
-  const { data, error } = await supabase.from("wishlist").select("*").eq("month", "someday").order("created_at", { ascending: false });
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+  const { data, error } = await supabase.from("wishlist").select("*").eq("month", "someday").eq("user_id", user.id).order("created_at", { ascending: false });
   if (error) throw error;
   return (data as any[]) ?? [];
 }
