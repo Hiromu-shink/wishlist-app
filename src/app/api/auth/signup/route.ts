@@ -11,11 +11,14 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.redirect(new URL(`/signup?error=${encodeURIComponent(error.message)}`, request.url));
   }
-  // Eメール確認が有効な場合、直ちにセッションは作成されない
-  if (!data.session) {
-    return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent("確認メールを送信しました。メールを確認してください。")}`, request.url));
+  // 要望: メール承認の有無にかかわらず、登録後はログイン画面へ遷移させる
+  // 万一セッションが作成されている場合は一旦サインアウトしてログイン画面へ誘導
+  if (data.session) {
+    await supabase.auth.signOut();
   }
-  return NextResponse.redirect(new URL(redirectTo, request.url));
+  const url = new URL(`/login?message=${encodeURIComponent("アカウントを作成しました。ログインしてください。")}`, request.url);
+  if (redirectTo) url.searchParams.set("redirect_to", redirectTo);
+  return NextResponse.redirect(url);
 }
 
 

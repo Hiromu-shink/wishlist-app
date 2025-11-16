@@ -26,7 +26,6 @@ export function HomeClient() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [mobilePendingMonth, setMobilePendingMonth] = useState<string | null>(null);
   const fallbackMonth = useMemo(() => currentMonth(), []);
   const fallbackYear = useMemo(() => Number(fallbackMonth.split("-")[0]), [fallbackMonth]);
   const [pickerYear, setPickerYear] = useState(() => {
@@ -202,7 +201,6 @@ export function HomeClient() {
         onClick={() => {
           const input = mobileInputRef.current;
           if (!input) return;
-          setMobilePendingMonth(null);
           if (typeof input.showPicker === "function") {
             input.showPicker();
           } else {
@@ -223,12 +221,8 @@ export function HomeClient() {
         aria-label="年月を選択"
         onChange={(e) => {
           if (!e.target.value) return;
-          if (isSomeday) {
-            // Someday 表示中は即遷移しない。ユーザーの確定操作を待つ。
-            setMobilePendingMonth(e.target.value);
-          } else {
-            handleMonthChange(e.target.value);
-          }
+          // iOS の場合、change は「完了（Done）」を押したときのみ発火する
+          handleMonthChange(e.target.value);
         }}
       />
     </div>
@@ -242,18 +236,6 @@ export function HomeClient() {
             <div className="flex-shrink-0 w-[150px] text-left">
               {isTouchDevice ? mobilePicker : desktopPicker}
             </div>
-            {isSomeday && mobilePendingMonth && (
-              <button
-                type="button"
-                className={`${buttonBase} ml-2`}
-                onClick={() => {
-                  handleMonthChange(mobilePendingMonth);
-                  setMobilePendingMonth(null);
-                }}
-              >
-                この月に移動
-              </button>
-            )}
           </div>
           <div className="flex-shrink-0 w-[150px] text-right">
             <SortSelector

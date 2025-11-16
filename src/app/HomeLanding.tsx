@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { randomInt } from "crypto";
-import { createSupabaseServerAnon } from "@/lib/supabase/server";
+import { createSupabaseRSCClient } from "@/lib/supabase/server";
 import type { WishlistItem } from "@/types/wishlist";
 
 function currentMonth() {
@@ -73,13 +73,18 @@ function Card({ title, description, footer, href, imageUrl, hideContent = false,
 
 export async function HomeLanding() {
   const month = currentMonth();
-  const supabase = createSupabaseServerAnon();
+  const supabase = await createSupabaseRSCClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  // page.tsx 側で未ログインはリダイレクトしているが、型安全のため念のため
+  if (!user) {
+    return null;
+  }
 
   const [{ data: currentItems }, { data: somedayItems }, { data: purchasedItems }, { data: allItems }] = await Promise.all([
-    supabase.from("wishlist").select("*").eq("month", month),
-    supabase.from("wishlist").select("*").eq("month", "someday"),
-    supabase.from("wishlist").select("*").eq("is_purchased", true).neq("month", "someday"),
-    supabase.from("wishlist").select("price, is_purchased, month"),
+    supabase.from("wishlist").select("*").eq("user_id", user.id).eq("month", month),
+    supabase.from("wishlist").select("*").eq("user_id", user.id).eq("month", "someday"),
+    supabase.from("wishlist").select("*").eq("user_id", user.id).eq("is_purchased", true).neq("month", "someday"),
+    supabase.from("wishlist").select("price, is_purchased, month").eq("user_id", user.id),
   ]);
 
   const highlightCurrent = pickCurrentHighlight((currentItems as WishlistItem[]) ?? []);
