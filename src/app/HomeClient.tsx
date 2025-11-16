@@ -108,6 +108,10 @@ export function HomeClient() {
     startTransition(async () => {
       try {
         const res = await fetch(`/api/wishlist?month=${encodeURIComponent(month)}&sort=${encodeURIComponent(sort)}`, { cache: "no-store" });
+        if (res.status === 401) {
+          router.push("/login?redirect_to=" + encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/"));
+          return;
+        }
         if (!res.ok) throw new Error(`failed: ${res.status}`);
         const data = await res.json();
         setItems((data?.items ?? []) as WishlistItem[]);
@@ -173,7 +177,11 @@ export function HomeClient() {
                 <button
                   type="button"
                   key={monthValue}
-                  onClick={() => setPickerMonth(monthNumber)}
+                  onClick={() => {
+                    setPickerMonth(monthNumber);
+                    handleMonthChange(monthValue);
+                    setPickerOpen(false);
+                  }}
                   className={`rounded px-2 py-2 text-xs font-semibold ${
                     isSelected ? "bg-black text-white" : "hover:bg-gray-100"
                   }`}
