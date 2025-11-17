@@ -34,9 +34,21 @@ export async function GET(request: Request) {
 			return NextResponse.redirect(requestUrl.origin + "/login?error=no_session");
 		}
 
+		// セッションがCookieに保存されるまで少し待つ
+		// createSupabaseServerClientのsetメソッドがCookieを設定するが、
+		// リダイレクト前に確実に保存されるように待機
+		await new Promise(resolve => setTimeout(resolve, 150));
+
 		// デフォルトはホーム、クライアント側でsessionStorageから取得する想定
 		const redirectTo = "/";
-		return NextResponse.redirect(requestUrl.origin + redirectTo);
+		
+		// リダイレクトレスポンスを作成
+		const response = NextResponse.redirect(requestUrl.origin + redirectTo);
+		
+		// Cookieが確実に送信されるように、Cache-Controlヘッダーを設定
+		response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+		
+		return response;
 	} catch (err) {
 		console.error("Unexpected error in OAuth callback:", err);
 		return NextResponse.redirect(requestUrl.origin + "/login?error=unexpected_error");
