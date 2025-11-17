@@ -20,6 +20,11 @@ export function LogoutButton({ className, variant = 'default', onComplete }: Log
     try {
       const supabase = getSupabaseBrowser();
       
+      // 現在のユーザーを確認
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('[Logout] Before logout, user:', user?.email);
+      console.log('[Logout] User ID:', user?.id);
+      
       // セッションストレージをクリア（OAuthリダイレクト情報など）
       if (typeof window !== 'undefined') {
         sessionStorage.clear();
@@ -27,7 +32,9 @@ export function LogoutButton({ className, variant = 'default', onComplete }: Log
       }
       
       // ログアウト処理
+      console.log('[Logout] Calling signOut...');
       await supabase.auth.signOut();
+      console.log('[Logout] After logout');
       
       // Cookieを完全に削除（クライアント側）
       if (typeof window !== 'undefined' && typeof document !== 'undefined') {

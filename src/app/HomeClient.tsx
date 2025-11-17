@@ -107,22 +107,38 @@ export function HomeClient() {
     setIsLoading(true);
     startTransition(async () => {
       try {
+        // クライアント側でセッションを確認
+        if (typeof window !== 'undefined') {
+          const { getSupabaseBrowser } = await import('@/lib/supabase/client');
+          const supabase = getSupabaseBrowser();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            console.log('[HomeClient] Current session:', session.user.email);
+            console.log('[HomeClient] User ID:', session.user.id);
+          } else {
+            console.log('[HomeClient] No session found');
+          }
+        }
+        
+        console.log('[HomeClient] Fetching wishlist items for month:', month);
         const res = await fetch(`/api/wishlist?month=${encodeURIComponent(month)}&sort=${encodeURIComponent(sort)}`, { cache: "no-store" });
         if (res.status === 401) {
+          console.log('[HomeClient] 401 Unauthorized, redirecting to login');
           router.push("/login?redirect_to=" + encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/"));
           return;
         }
         if (!res.ok) throw new Error(`failed: ${res.status}`);
         const data = await res.json();
+        console.log('[HomeClient] Received items count:', data?.items?.length ?? 0);
         setItems((data?.items ?? []) as WishlistItem[]);
       } catch (error) {
-        console.error("Failed to load items:", error);
+        console.error("[HomeClient] Failed to load items:", error);
         setItems([]);
       } finally {
         setIsLoading(false);
       }
     });
-  }, [month, sort]);
+  }, [month, sort, router]);
 
   // 合計計算: 購入済みと未定アイテムを除外
   const total = items.filter((i) => !i.is_purchased && !i.is_someday).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
