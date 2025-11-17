@@ -20,6 +20,21 @@ export async function GET(request: Request) {
 	}
 
 	try {
+		// まず古いセッションをクリアするためのクライアントを作成
+		const supabaseForCleanup = await createSupabaseServerClient();
+		
+		// 古いセッションをクリア（既存のCookieからセッションを取得して削除）
+		try {
+			const { data: { session: oldSession } } = await supabaseForCleanup.auth.getSession();
+			if (oldSession) {
+				await supabaseForCleanup.auth.signOut();
+			}
+		} catch (cleanupError) {
+			// クリーンアップエラーは無視（セッションがない場合など）
+			console.log("Cleanup error (ignored):", cleanupError);
+		}
+		
+		// 新しいセッションを取得するためのクライアントを作成
 		const supabase = await createSupabaseServerClient();
 		const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 		
@@ -37,12 +52,13 @@ export async function GET(request: Request) {
 		// セッションがCookieに保存されるまで少し待つ
 		// createSupabaseServerClientのsetメソッドがCookieを設定するが、
 		// リダイレクト前に確実に保存されるように待機
-		await new Promise(resolve => setTimeout(resolve, 150));
+		await new Promise(resolve => setTimeout(resolve, 200));
 
 		// デフォルトはホーム、クライアント側でsessionStorageから取得する想定
 		const redirectTo = "/";
 		
 		// リダイレクトレスポンスを作成
+		// createSupabaseServerClientのsetメソッドが既に新しいCookieを設定している
 		const response = NextResponse.redirect(requestUrl.origin + redirectTo);
 		
 		// Cookieが確実に送信されるように、Cache-Controlヘッダーを設定

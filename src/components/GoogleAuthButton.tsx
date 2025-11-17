@@ -21,7 +21,9 @@ export function GoogleAuthButton({ label = "Google でログイン" }: { label?:
       provider: "google",
       options: {
         redirectTo: callbackUrl,
-        // queryParamsは最小限に（Supabaseが管理）
+        queryParams: {
+          prompt: "select_account", // 毎回アカウント選択を強制
+        },
       },
     });
   }
