@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/supabase/client';
 
@@ -14,22 +13,37 @@ type LogoutButtonProps = {
 };
 
 export function LogoutButton({ className, variant = 'default', onComplete }: LogoutButtonProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
     setLoading(true);
     try {
       const supabase = getSupabaseBrowser();
+      
+      // セッションストレージをクリア（OAuthリダイレクト情報など）
+      if (typeof window !== 'undefined') {
+        sessionStorage.clear();
+      }
+      
+      // ログアウト処理
       await supabase.auth.signOut();
-      router.push('/login');
-      router.refresh();
+      
+      // コールバックがあれば実行
       onComplete?.();
+      
+      // 完全にページをリロードしてログインページに遷移
+      // これによりサーバー側とクライアント側の状態が完全にリセットされる
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      setLoading(false);
+      // エラーが発生してもログインページに遷移
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
+    // finallyは不要（ページがリロードされるため）
   }
 
   const baseClass = variant === 'menu' ? menuButton : buttonWhite;
