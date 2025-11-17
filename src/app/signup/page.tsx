@@ -24,7 +24,9 @@ export default async function SignUpPage({ searchParams }: { searchParams?: { [k
         <input name="password" type="password" required placeholder="パスワード" className="w-full h-10 px-3 border rounded" />
         <button className="w-full h-10 px-4 py-2 border rounded bg-black text-white">登録</button>
       </form>
+      {/* 
       <GoogleAuthButton label="Google で登録" />
+      */}
       <p className="text-sm text-gray-600">
         既にアカウントをお持ちの方は <Link className="underline" href="/login">ログイン</Link>
       </p>

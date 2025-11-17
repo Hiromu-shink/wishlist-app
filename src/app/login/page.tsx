@@ -42,7 +42,9 @@ export default async function LoginPage(props: Props) {
         <input name="password" type="password" required placeholder="パスワード" className="w-full h-10 px-3 border rounded" />
         <button className="w-full h-10 px-4 py-2 border rounded bg-black text-white">ログイン</button>
       </form>
+      {/* 
       <GoogleAuthButton label="Google でログイン" />
+      */}
       <p className="text-sm text-gray-600">
         アカウントがない方は <Link className="underline" href="/signup">新規登録</Link>
       </p>
