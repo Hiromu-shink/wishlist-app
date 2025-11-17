@@ -6,14 +6,22 @@ export function GoogleAuthButton({ label = "Google でログイン" }: { label?:
   async function handleClick() {
     const supabase = getSupabaseBrowser();
     const origin = typeof window !== "undefined" ? window.location.origin : undefined;
+    if (!origin) return;
+    
+    // 現在のパスを保存（コールバック後に戻るため）
     const currentPath = typeof window !== "undefined" ? (window.location.pathname + window.location.search) : "/";
-    const redirectTo = origin ? `${origin}/auth/callback?redirect_to=${encodeURIComponent(currentPath)}` : undefined;
+    if (currentPath !== "/login" && currentPath !== "/signup") {
+      sessionStorage.setItem("oauth_redirect_to", currentPath);
+    }
+    
+    // SupabaseのコールバックURL（絶対URLのみ）
+    const callbackUrl = `${origin}/auth/callback`;
+    
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // Redirect back to our Next.js route handler which calls exchangeCodeForSession
-        redirectTo,
-        queryParams: { prompt: "select_account" },
+        redirectTo: callbackUrl,
+        // queryParamsは最小限に（Supabaseが管理）
       },
     });
   }

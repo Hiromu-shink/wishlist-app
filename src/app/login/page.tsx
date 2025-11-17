@@ -11,13 +11,31 @@ async function getSession() {
   return user;
 }
 
-export default async function LoginPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+type Props = {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
+};
+
+export default async function LoginPage(props: Props) {
   const user = await getSession();
   if (user) redirect("/");
-  const redirectTo = typeof searchParams?.redirect_to === "string" ? searchParams!.redirect_to! : "/";
+  
+  const searchParams = await (props.searchParams instanceof Promise ? props.searchParams : Promise.resolve(props.searchParams || {}));
+  const error = typeof searchParams.error === "string" ? searchParams.error : null;
+  const redirectTo = typeof searchParams.redirect_to === "string" ? searchParams.redirect_to : "/";
+  
   return (
     <div className="mx-auto max-w-sm p-6 space-y-4">
       <h1 className="text-xl font-semibold">ログイン</h1>
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+          {error === "oauth_cancelled" && "ログインがキャンセルされました。"}
+          {error === "oauth_failed" && "ログインに失敗しました。もう一度お試しください。"}
+          {error === "no_code" && "認証コードが取得できませんでした。"}
+          {error === "no_session" && "セッションの作成に失敗しました。"}
+          {error === "unexpected_error" && "予期しないエラーが発生しました。"}
+          {!["oauth_cancelled", "oauth_failed", "no_code", "no_session", "unexpected_error"].includes(error) && `エラー: ${error}`}
+        </div>
+      )}
       <form className="space-y-3" action="/api/auth/login" method="post">
         <input type="hidden" name="redirect_to" value={redirectTo} />
         <input name="email" type="email" required placeholder="メールアドレス" className="w-full h-10 px-3 border rounded" />
