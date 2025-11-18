@@ -141,7 +141,7 @@ export function HomeClient() {
         aria-expanded={pickerOpen}
       >
         <span className="text-base tracking-wide">{pickerYear}</span>
-        <span className="text-base text-gray-700">▼</span>
+        <span className="text-base text-gray-700" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>▼</span>
       </button>
       {pickerOpen && (
         <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
@@ -153,7 +153,7 @@ export function HomeClient() {
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
             >
-              <span className="text-base text-gray-700">◀</span>
+              <span className="text-base text-gray-700" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>◀</span>
             </button>
             <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
             <button
@@ -163,7 +163,7 @@ export function HomeClient() {
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
             >
-              <span className="text-base text-gray-700">▶</span>
+              <span className="text-base text-gray-700" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>▶</span>
             </button>
           </div>
           <div className="grid grid-cols-4 gap-2">
