@@ -153,7 +153,7 @@ export function HomeClient() {
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
             >
-              ◀
+              <span className="text-base text-gray-700">◀</span>
             </button>
             <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
             <button
@@ -163,7 +163,7 @@ export function HomeClient() {
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
             >
-              ▶
+              <span className="text-base text-gray-700">▶</span>
             </button>
           </div>
           <div className="grid grid-cols-4 gap-2">
