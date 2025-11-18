@@ -27,7 +27,6 @@ export function HomeClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isMobileMonthOpen, setIsMobileMonthOpen] = useState(false);
-  const lastPickedRef = useRef<string | null>(null);
   const fallbackMonth = useMemo(() => currentMonth(), []);
   const fallbackYear = useMemo(() => Number(fallbackMonth.split("-")[0]), [fallbackMonth]);
   const [pickerYear, setPickerYear] = useState(() => {
@@ -38,7 +37,6 @@ export function HomeClient() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
   const mobileInputRef = useRef<HTMLInputElement | null>(null);
-  // removed pendingMobileMonth: we will navigate on confirmed change only (no blur navigation)
   const [pickerMonth, setPickerMonth] = useState(() => {
     const source = isSomeday ? fallbackMonth : month;
     const m = Number(source.split("-")[1]);
@@ -247,20 +245,20 @@ export function HomeClient() {
         aria-label="年月を選択"
         onFocus={() => {
           setIsMobileMonthOpen(true);
-          lastPickedRef.current = null;
         }}
         onChange={(e) => {
-          // ここでは遷移しない。完了（Done）で閉じられたタイミングで確定する。
-          lastPickedRef.current = e.target.value || null;
+          // iOSでは完了（Done）ボタンを押した時のみonChangeが発火する
+          // そのため、ここで直接遷移する
+          setIsMobileMonthOpen(false);
+          const newMonth = e.target.value;
+          if (newMonth) {
+            handleMonthChange(newMonth);
+          }
         }}
         onBlur={() => {
-          // ピッカーが閉じた。最後に選ばれていた値があればこのタイミングで遷移。
+          // onBlurは完了ボタンでもキャンセルでも発火するため、
+          // ここでは遷移しない（onChangeのみで遷移する）
           setIsMobileMonthOpen(false);
-          const picked = lastPickedRef.current;
-          lastPickedRef.current = null;
-          if (picked) {
-            handleMonthChange(picked);
-          }
         }}
       />
     </div>
