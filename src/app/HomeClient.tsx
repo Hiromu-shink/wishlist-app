@@ -135,13 +135,14 @@ export function HomeClient() {
     <div className="relative w-full" ref={pickerRef}>
       <button
         type="button"
-        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
+        className={`${buttonBase} w-full flex items-center justify-center gap-2 font-semibold`}
         onClick={() => setPickerOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={pickerOpen}
       >
+        <span className="text-base text-gray-700">◀</span>
         <span className="text-base tracking-wide">{pickerYear}</span>
-        <span className="text-base text-gray-700">▼</span>
+        <span className="text-base text-gray-700">▶</span>
       </button>
       {pickerOpen && (
         <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
