@@ -25,8 +25,6 @@ export function HomeClient() {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [isMobileMonthOpen, setIsMobileMonthOpen] = useState(false);
   const fallbackMonth = useMemo(() => currentMonth(), []);
   const fallbackYear = useMemo(() => Number(fallbackMonth.split("-")[0]), [fallbackMonth]);
   const [pickerYear, setPickerYear] = useState(() => {
@@ -36,7 +34,6 @@ export function HomeClient() {
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
-  const mobileInputRef = useRef<HTMLInputElement | null>(null);
   const [pickerMonth, setPickerMonth] = useState(() => {
     const source = isSomeday ? fallbackMonth : month;
     const m = Number(source.split("-")[1]);
@@ -87,19 +84,6 @@ export function HomeClient() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pickerOpen]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const mq = window.matchMedia("(pointer: coarse)");
-      const update = (e: MediaQueryListEvent | MediaQueryList) => {
-        setIsTouchDevice(e.matches);
-      };
-      update(mq);
-      const handler = (e: MediaQueryListEvent) => update(e);
-      mq.addEventListener("change", handler);
-      return () => mq.removeEventListener("change", handler);
-    }
-    return () => {};
-  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -211,58 +195,8 @@ export function HomeClient() {
     </div>
   );
 
-  const mobileDisplayedYear = useMemo(() => {
-    if (isSomeday) return pickerYear;
-    const y = Number(month.split("-")[0]);
-    return Number.isFinite(y) ? y : pickerYear;
-  }, [isSomeday, month, pickerYear]);
-
-  const mobilePicker = (
-    <div className="relative">
-      <button
-        type="button"
-        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
-        onClick={() => {
-          const input = mobileInputRef.current;
-          if (!input) return;
-          if (typeof input.showPicker === "function") {
-            input.showPicker();
-          } else {
-            input.click();
-          }
-        }}
-      >
-        <span className="text-base tracking-wide">{mobileDisplayedYear}</span>
-        <span className="text-base text-gray-700">▼</span>
-      </button>
-      <input
-        ref={mobileInputRef}
-        type="month"
-        className="absolute inset-0 h-full w-full opacity-0"
-        value={isSomeday ? "" : month}
-        min="2025-01"
-        max="2074-12"
-        aria-label="年月を選択"
-        onFocus={() => {
-          setIsMobileMonthOpen(true);
-        }}
-        onChange={(e) => {
-          // iOSでは完了（Done）ボタンを押した時のみonChangeが発火する
-          // そのため、ここで直接遷移する
-          setIsMobileMonthOpen(false);
-          const newMonth = e.target.value;
-          if (newMonth) {
-            handleMonthChange(newMonth);
-          }
-        }}
-        onBlur={() => {
-          // onBlurは完了ボタンでもキャンセルでも発火するため、
-          // ここでは遷移しない（onChangeのみで遷移する）
-          setIsMobileMonthOpen(false);
-        }}
-      />
-    </div>
-  );
+  // モバイルでもPCと同じデスクトップピッカーを使用
+  // これにより、選択した瞬間に遷移し、確実に動作する
 
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
@@ -270,7 +204,7 @@ export function HomeClient() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="flex-shrink-0 w-[150px] text-left">
-              {isTouchDevice ? mobilePicker : desktopPicker}
+              {desktopPicker}
             </div>
           </div>
           <div className="flex-shrink-0 w-[150px] text-right">
