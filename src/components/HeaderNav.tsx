@@ -60,18 +60,32 @@ export function HeaderNav() {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
                 <Link
+                  href="/wishlist"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  欲しいものリスト
+                </Link>
+                <Link
+                  href="/purchased"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  購入済みリスト
+                </Link>
+                <Link
+                  href="/someday"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  いつか欲しいリスト
+                </Link>
+                <Link
                   href="/account"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
                   アカウント情報
-                </Link>
-                <Link
-                  href="/month?month=someday"
-                  className={menuItem}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  いつか欲しいリスト
                 </Link>
                 <LogoutButton
                   variant="menu"
