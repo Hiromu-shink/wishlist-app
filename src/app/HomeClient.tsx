@@ -152,8 +152,9 @@ export function HomeClient() {
               onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
               disabled={pickerYear <= startYear}
               aria-label="前年へ"
+              style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
             >
-              {'\u25C0'}
+              ◀
             </button>
             <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
             <button
@@ -162,8 +163,9 @@ export function HomeClient() {
               onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
               disabled={pickerYear >= endYear}
               aria-label="翌年へ"
+              style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
             >
-              {'\u25B6'}
+              ▶
             </button>
           </div>
           <div className="grid grid-cols-4 gap-2">
