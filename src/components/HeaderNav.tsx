@@ -81,6 +81,13 @@ export function HeaderNav() {
                   いつか欲しいリスト
                 </Link>
                 <Link
+                  href="/trash"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  削除済みアイテム
+                </Link>
+                <Link
                   href="/account"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
