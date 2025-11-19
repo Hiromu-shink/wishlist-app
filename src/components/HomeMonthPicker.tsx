@@ -98,8 +98,8 @@ export function HomeMonthPicker() {
   );
 
   return (
-    <div className="flex justify-center mb-6">
-      <div className="w-[220px]">
+    <div className="mb-4">
+      <div className="flex-shrink-0 w-[150px] text-left">
         {desktopPicker}
       </div>
     </div>
