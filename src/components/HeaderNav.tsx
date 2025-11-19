@@ -60,11 +60,11 @@ export function HeaderNav() {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg focus:outline-none" role="menu">
                 <Link
-                  href="/wishlist"
+                  href="/someday"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  欲しいものリスト
+                  いつか欲しいリスト
                 </Link>
                 <Link
                   href="/purchased"
@@ -74,18 +74,18 @@ export function HeaderNav() {
                   購入済みリスト
                 </Link>
                 <Link
-                  href="/someday"
-                  className={menuItem}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  いつか欲しいリスト
-                </Link>
-                <Link
                   href="/trash"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
                   削除済みアイテム
+                </Link>
+                <Link
+                  href="/stats"
+                  className={menuItem}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  統計・ダッシュボード
                 </Link>
                 <Link
                   href="/account"
