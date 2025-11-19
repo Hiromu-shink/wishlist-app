@@ -3,6 +3,7 @@ import { HomeClient } from "./HomeClient";
 import { createSupabaseRSCClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { OAuthRedirectHandler } from "@/components/OAuthRedirectHandler";
+import { HomeMonthPicker } from "@/components/HomeMonthPicker";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +38,8 @@ async function AllItemsPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">欲しいものリスト</h1>
       <p className="text-gray-600 mb-4">全ての欲しいもの（{items?.length || 0}個）</p>
+
+      <HomeMonthPicker />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
         {items?.map((item) => (
