@@ -37,7 +37,6 @@ export function HomeMonthPicker() {
   }, [pickerOpen]);
 
   function handleMonthClick(monthValue: string) {
-    console.log('[HomeMonthPicker] Navigating to month:', monthValue);
     router.push(`/?month=${monthValue}`);
     setPickerOpen(false);
   }
