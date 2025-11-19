@@ -129,7 +129,7 @@ export function HomeClient() {
   function handleMonthChange(newMonth: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("month", newMonth);
-    router.push(`/month?${params.toString()}`);
+    router.push(`/?${params.toString()}`);
   }
 
   const desktopPicker = (
