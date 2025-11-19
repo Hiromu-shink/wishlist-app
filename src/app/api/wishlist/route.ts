@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
 		console.log('[API Wishlist] User:', user.email);
 		console.log('[API Wishlist] User ID:', user.id);
-		console.log('[API Wishlist] Month:', month);
+		console.log('[API Wishlist] month param:', month);
 		console.log('[API Wishlist] Sort:', sort);
 
 		let query = supabase.from("wishlist").select("*").eq("user_id", user.id);

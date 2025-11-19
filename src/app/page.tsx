@@ -137,23 +137,13 @@ export default async function Home({
 
   const month = searchParams?.month;
 
-  // 月指定がある場合
-  if (month) {
-    console.log('[Home] Month specified:', month);
+  console.log('[HomePage Server] month param:', month);
+
+  // 月指定がある場合（someday 以外）
+  if (month && month !== 'someday') {
+    console.log('[HomePage Server] Showing month page:', month);
     
-    // その月のアイテムだけ取得（monthカラムでフィルタリング）
-    const { data: items } = await supabase
-      .from("wishlist")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("is_purchased", false)
-      .eq("month", month)
-      .order("created_at", { ascending: false });
-    
-    console.log('[Home] Month items count:', items?.length ?? 0);
-    
-    // 月別ページを表示（4列レイアウト）
-    // HomeClientを使用（既に月選択と並び替え機能がある）
+    // 月別ページを表示（HomeClientを使用）
     return (
       <>
         <OAuthRedirectHandler />
@@ -164,8 +154,8 @@ export default async function Home({
     );
   }
   
-  // 月指定がない場合（ホーム）
-  console.log('[Home] No month specified, showing all items');
+  // ホーム: 全てのアイテムを表示
+  console.log('[HomePage Server] Showing all items');
   
   return (
     <>

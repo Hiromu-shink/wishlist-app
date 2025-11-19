@@ -19,9 +19,14 @@ function currentMonth() {
 export function HomeClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const month = searchParams.get("month") || currentMonth();
+  const monthParam = searchParams.get("month");
+  const month = monthParam || currentMonth();
   const sort = searchParams.get("sort") || "created-desc";
   const isSomeday = month === "someday";
+  
+  console.log('[HomeClient] Received month param:', monthParam);
+  console.log('[HomeClient] Using month:', month);
+  console.log('[HomeClient] isSomeday:', isSomeday);
   
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
