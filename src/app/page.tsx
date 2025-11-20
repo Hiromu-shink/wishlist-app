@@ -110,6 +110,10 @@ export default async function Home({
 }: {
   searchParams: { month?: string };
 }) {
+  console.log('=== [HomePage Server] Start ===');
+  console.log('[HomePage Server] searchParams:', searchParams);
+  console.log('[HomePage Server] month:', searchParams?.month);
+
   const supabase = await createSupabaseRSCClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
@@ -137,7 +141,11 @@ export default async function Home({
 
   const month = searchParams?.month;
 
-  console.log('[HomePage Server] month param:', month);
+  if (month) {
+    console.log('[HomePage Server] Month is specified:', month);
+  } else {
+    console.log('[HomePage Server] No month specified');
+  }
 
   // 月指定がある場合（someday 以外）
   if (month && month !== 'someday') {
