@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ListFilter } from "lucide-react";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
-import { SortSelector } from "@/components/SortSelector";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
@@ -132,75 +131,43 @@ export function HomeClient() {
   // 合計計算: 購入済みと未定アイテムを除外
   const total = items.filter((i) => !i.is_purchased && !i.is_someday).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
 
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const filterRef = useRef<HTMLDivElement | null>(null);
+
   function handleMonthChange(newMonth: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("month", newMonth);
     router.push(`/?${params.toString()}`);
   }
 
-  const desktopPicker = (
-    <div className="relative w-full" ref={pickerRef}>
-      <button
-        type="button"
-        className={`${buttonBase} w-full flex items-center justify-center gap-3 font-semibold`}
-        onClick={() => setPickerOpen((prev) => !prev)}
-        aria-haspopup="dialog"
-        aria-expanded={pickerOpen}
-      >
-        <span className="text-base tracking-wide">{pickerYear}</span>
-        <ChevronDown size={20} className="text-gray-700" />
-      </button>
-      {pickerOpen && (
-        <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
-              onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
-              disabled={pickerYear <= startYear}
-              aria-label="前年へ"
-            >
-              <ChevronLeft size={20} className="text-gray-700" />
-            </button>
-            <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
-            <button
-              type="button"
-              className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
-              onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
-              disabled={pickerYear >= endYear}
-              aria-label="翌年へ"
-            >
-              <ChevronRight size={20} className="text-gray-700" />
-            </button>
-          </div>
-          <div className="grid grid-cols-4 gap-2">
-            {Array.from({ length: 12 }).map((_, idx) => {
-              const monthNumber = idx + 1;
-              const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
-              const isSelected = pickerMonth === monthNumber;
-              return (
-                <button
-                  type="button"
-                  key={monthValue}
-                  onClick={() => {
-                    setPickerMonth(monthNumber);
-                    handleMonthChange(monthValue);
-                    setPickerOpen(false);
-                  }}
-                  className={`rounded px-2 py-2 text-xs font-semibold ${
-                    isSelected ? "bg-black text-white" : "hover:bg-gray-100"
-                  }`}
-                >
-                  {monthNumber}
-                </button>
-              );
-            })}
-          </div>
-          
-        </div>
-      )}
-    </div>
-  );
+  function handleSortChange(newSort: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (month) params.set("month", month);
+    params.set("sort", newSort);
+    router.push(`/?${params.toString()}`);
+    setShowFilterMenu(false);
+  }
+
+  useEffect(() => {
+    if (!showFilterMenu) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setShowFilterMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showFilterMenu]);
+
+  const sortOptions = [
+    { value: "created-desc", label: "新着順" },
+    { value: "priority-desc", label: "優先度 ▼" },
+    { value: "priority-asc", label: "優先度 ▲" },
+    { value: "price-desc", label: "価格 ▼" },
+    { value: "price-asc", label: "価格 ▲" },
+    { value: "deadline-asc", label: "期限 ▲" },
+    { value: "deadline-desc", label: "期限 ▼" },
+  ];
 
   // モバイルでもPCと同じデスクトップピッカーを使用
   // これにより、選択した瞬間に遷移し、確実に動作する
@@ -228,22 +195,106 @@ export function HomeClient() {
       {breadcrumbItems.length > 0 && (
         <Breadcrumb items={breadcrumbItems} />
       )}
-      <header className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex-shrink-0 w-[150px] text-left">
-              {desktopPicker}
+      
+      {/* 月選択とフィルター */}
+      <div className="flex justify-between items-center mb-4">
+        {/* 月選択 */}
+        <div className="relative" ref={pickerRef}>
+          <button
+            type="button"
+            onClick={() => setPickerOpen((prev) => !prev)}
+            className="flex items-center gap-1 text-gray-700 hover:text-blue-600"
+            aria-haspopup="dialog"
+            aria-expanded={pickerOpen}
+          >
+            <span className="font-medium">{pickerYear}</span>
+            {pickerOpen ? (
+              <ChevronDown size={20} />
+            ) : (
+              <ChevronRight size={20} />
+            )}
+          </button>
+          {pickerOpen && (
+            <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
+                  onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
+                  disabled={pickerYear <= startYear}
+                  aria-label="前年へ"
+                >
+                  <ChevronLeft size={20} className="text-gray-700" />
+                </button>
+                <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
+                <button
+                  type="button"
+                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
+                  onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
+                  disabled={pickerYear >= endYear}
+                  aria-label="翌年へ"
+                >
+                  <ChevronRight size={20} className="text-gray-700" />
+                </button>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {Array.from({ length: 12 }).map((_, idx) => {
+                  const monthNumber = idx + 1;
+                  const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
+                  const isSelected = pickerMonth === monthNumber;
+                  return (
+                    <button
+                      type="button"
+                      key={monthValue}
+                      onClick={() => {
+                        setPickerMonth(monthNumber);
+                        handleMonthChange(monthValue);
+                        setPickerOpen(false);
+                      }}
+                      className={`rounded px-2 py-2 text-xs font-semibold ${
+                        isSelected ? "bg-black text-white" : "hover:bg-gray-100"
+                      }`}
+                    >
+                      {monthNumber}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          <div className="flex-shrink-0 w-[150px] text-right">
-            <SortSelector
-              month={month}
-              sort={sort}
-              className={`${buttonBase} w-full`}
-            />
-          </div>
+          )}
         </div>
-      </header>
+
+        {/* フィルター */}
+        <div className="relative" ref={filterRef}>
+          <button
+            type="button"
+            onClick={() => setShowFilterMenu((prev) => !prev)}
+            className="text-gray-700 hover:text-blue-600"
+            aria-haspopup="menu"
+            aria-expanded={showFilterMenu}
+          >
+            <ListFilter size={20} />
+          </button>
+          {showFilterMenu && (
+            <div className="absolute right-0 z-40 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleSortChange(option.value)}
+                  className={`block w-full px-4 py-2 text-left text-sm ${
+                    sort === option.value
+                      ? "bg-gray-100 font-semibold text-gray-900"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
       {!isSomeday && (
         <div className="flex items-center justify-between text-sm text-gray-700">
           <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
