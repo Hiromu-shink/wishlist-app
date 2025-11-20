@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getWishlistItemById, updateWishlistItem, deleteWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import type { WishlistItem } from "@/types/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/ToastProvider";
 import { PriorityStars } from "@/components/PriorityStars";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
 const buttonWhite = `${buttonBase} bg-white hover:bg-gray-50`;
@@ -233,8 +234,37 @@ export default function ItemDetailPage() {
     );
   }
 
+  // パンくずリストの生成
+  const breadcrumbItems = useMemo(() => {
+    if (!item) return [];
+    
+    // 簡易版: ホーム > アイテム名
+    return [
+      { label: 'ホーム', href: '/' },
+      { label: item.name }
+    ];
+    
+    // 完全版（コメントアウト）: ホーム > 月 > アイテム名
+    // if (item.month && item.month !== 'someday') {
+    //   const monthDate = new Date(`${item.month}-01`);
+    //   const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+    //   return [
+    //     { label: 'ホーム', href: '/' },
+    //     { label: monthLabel, href: `/?month=${item.month}` },
+    //     { label: item.name }
+    //   ];
+    // }
+    // return [
+    //   { label: 'ホーム', href: '/' },
+    //   { label: item.name }
+    // ];
+  }, [item]);
+
   return (
     <div className="mx-auto max-w-2xl p-6 space-y-6">
+      {breadcrumbItems.length > 0 && (
+        <Breadcrumb items={breadcrumbItems} />
+      )}
       {!editing ? (
         <div className="space-y-4">
           <div className="flex flex-wrap items-start gap-2">

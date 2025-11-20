@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { SortSelector } from "@/components/SortSelector";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
 const startYear = 2025;
@@ -204,8 +205,29 @@ export function HomeClient() {
   // モバイルでもPCと同じデスクトップピッカーを使用
   // これにより、選択した瞬間に遷移し、確実に動作する
 
+  // パンくずリストの生成
+  const breadcrumbItems = useMemo(() => {
+    if (isSomeday) {
+      return [
+        { label: 'ホーム', href: '/' },
+        { label: 'いつか欲しいリスト' }
+      ];
+    } else if (month) {
+      const monthDate = new Date(`${month}-01`);
+      const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+      return [
+        { label: 'ホーム', href: '/' },
+        { label: monthLabel }
+      ];
+    }
+    return [];
+  }, [month, isSomeday]);
+
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-6">
+      {breadcrumbItems.length > 0 && (
+        <Breadcrumb items={breadcrumbItems} />
+      )}
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">

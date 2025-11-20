@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseRSCClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,10 @@ export default async function AccountPage() {
   if (!user) redirect("/login");
   return (
     <div className="mx-auto max-w-md p-6 space-y-6">
+      <Breadcrumb items={[
+        { label: 'ホーム', href: '/' },
+        { label: 'アカウント情報' }
+      ]} />
       <h1 className="text-xl font-semibold">アカウント情報</h1>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
