@@ -199,15 +199,21 @@ export function HomeClient() {
       {/* 月選択とフィルター */}
       <div className="flex justify-between items-center mb-4">
         {/* 月選択 */}
-        <div className="relative" ref={pickerRef}>
+        <div className="relative flex items-center gap-1" ref={pickerRef}>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="font-medium text-gray-700 hover:text-blue-600 hover:underline"
+          >
+            {pickerYear}年
+          </button>
           <button
             type="button"
             onClick={() => setPickerOpen((prev) => !prev)}
-            className="flex items-center gap-1 text-gray-700 hover:text-blue-600"
+            className="text-gray-700 hover:text-blue-600"
             aria-haspopup="dialog"
             aria-expanded={pickerOpen}
           >
-            <span className="font-medium">{pickerYear}</span>
             {pickerOpen ? (
               <ChevronDown size={20} />
             ) : (
