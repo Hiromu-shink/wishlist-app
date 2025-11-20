@@ -108,12 +108,14 @@ async function AllItemsPage() {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const params = await searchParams;
+  
   console.log('=== [HomePage Server] Start ===');
-  console.log('[HomePage Server] searchParams:', searchParams);
-  console.log('[HomePage Server] searchParams keys:', Object.keys(searchParams || {}));
-  console.log('[HomePage Server] month:', searchParams.month);
+  console.log('[HomePage Server] searchParams:', params);
+  console.log('[HomePage Server] searchParams keys:', Object.keys(params || {}));
+  console.log('[HomePage Server] month:', params.month);
 
   const supabase = await createSupabaseRSCClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -140,7 +142,7 @@ export default async function Home({
     console.log('[Home] No session found');
   }
 
-  const month = searchParams.month as string | undefined;
+  const month = params.month as string | undefined;
 
   if (month) {
     console.log('[HomePage Server] Month is specified:', month);
