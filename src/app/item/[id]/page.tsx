@@ -236,16 +236,14 @@ export default function ItemDetailPage() {
 
   // パンくずリストの生成
   const breadcrumbItems = useMemo(() => {
-    if (!item) return [];
-    
     // 簡易版: ホーム > アイテム名
-    return [
+    return item ? [
       { label: 'ホーム', href: '/' },
       { label: item.name }
-    ];
+    ] : [];
     
     // 完全版（コメントアウト）: ホーム > 月 > アイテム名
-    // if (item.month && item.month !== 'someday') {
+    // if (item && item.month && item.month !== 'someday') {
     //   const monthDate = new Date(`${item.month}-01`);
     //   const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
     //   return [
@@ -254,10 +252,10 @@ export default function ItemDetailPage() {
     //     { label: item.name }
     //   ];
     // }
-    // return [
+    // return item ? [
     //   { label: 'ホーム', href: '/' },
     //   { label: item.name }
-    // ];
+    // ] : [];
   }, [item]);
 
   return (
