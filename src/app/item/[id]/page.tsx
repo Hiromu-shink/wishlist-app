@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useMemo } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getWishlistItemById, updateWishlistItem, deleteWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import type { WishlistItem } from "@/types/wishlist";
@@ -218,6 +218,24 @@ export default function ItemDetailPage() {
     });
   }
 
+  // パンくずリストの生成（early return の前に配置）
+  // 簡易版: ホーム > アイテム名
+  const breadcrumbItems = item ? [
+    { label: 'ホーム', href: '/' },
+    { label: item.name }
+  ] : [];
+  
+  // 完全版（コメントアウト）: ホーム > 月 > アイテム名
+  // if (item && item.month && item.month !== 'someday') {
+  //   const monthDate = new Date(`${item.month}-01`);
+  //   const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+  //   breadcrumbItems = [
+  //     { label: 'ホーム', href: '/' },
+  //     { label: monthLabel, href: `/?month=${item.month}` },
+  //     { label: item.name }
+  //   ];
+  // }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-2xl p-6">
@@ -233,30 +251,6 @@ export default function ItemDetailPage() {
       </div>
     );
   }
-
-  // パンくずリストの生成
-  const breadcrumbItems = useMemo(() => {
-    // 簡易版: ホーム > アイテム名
-    return item ? [
-      { label: 'ホーム', href: '/' },
-      { label: item.name }
-    ] : [];
-    
-    // 完全版（コメントアウト）: ホーム > 月 > アイテム名
-    // if (item && item.month && item.month !== 'someday') {
-    //   const monthDate = new Date(`${item.month}-01`);
-    //   const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
-    //   return [
-    //     { label: 'ホーム', href: '/' },
-    //     { label: monthLabel, href: `/?month=${item.month}` },
-    //     { label: item.name }
-    //   ];
-    // }
-    // return item ? [
-    //   { label: 'ホーム', href: '/' },
-    //   { label: item.name }
-    // ] : [];
-  }, [item]);
 
   return (
     <div className="mx-auto max-w-2xl p-6 space-y-6">
