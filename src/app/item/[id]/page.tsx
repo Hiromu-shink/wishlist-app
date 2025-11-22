@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState, useTransition, useMemo } from "react";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { getWishlistItemById, updateWishlistItem, deleteWishlistItem, fetchUrlMetadata } from "@/app/actions/wishlist";
 import type { WishlistItem } from "@/types/wishlist";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
@@ -28,8 +28,10 @@ function Stars({ n }: { n: number }) {
 export default function ItemDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
   const { push } = useToast();
+  const from = searchParams?.get("from");
 
   // guard for auth (client-side redirect fallback)
   // server page parent already protects, but keep UX safe
@@ -218,23 +220,30 @@ export default function ItemDetailPage() {
     });
   }
 
-  // パンくずリストの生成（early return の前に配置）
-  // 簡易版: ホーム > アイテム名
-  const breadcrumbItems = item ? [
-    { label: 'ホーム', href: '/' },
-    { label: item.name }
-  ] : [];
-  
-  // 完全版（コメントアウト）: ホーム > 月 > アイテム名
-  // if (item && item.month && item.month !== 'someday') {
-  //   const monthDate = new Date(`${item.month}-01`);
-  //   const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
-  //   breadcrumbItems = [
-  //     { label: 'ホーム', href: '/' },
-  //     { label: monthLabel, href: `/?month=${item.month}` },
-  //     { label: item.name }
-  //   ];
-  // }
+  // パンくずリストの生成
+  const breadcrumbItems = useMemo(() => {
+    if (!item) return [];
+    
+    const items = [{ label: 'ホーム', href: '/' }];
+    
+    if (from === 'someday') {
+      items.push({ label: 'いつか欲しいリスト', href: '/someday' });
+    } else if (from) {
+      // 月別ページ（例: 2025-11）
+      try {
+        const date = new Date(`${from}-01`);
+        if (!isNaN(date.getTime())) {
+          const monthName = date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+          items.push({ label: monthName, href: `/?month=${from}` });
+        }
+      } catch (e) {
+        // 日付の解析に失敗した場合は無視
+      }
+    }
+    
+    items.push({ label: item.name });
+    return items;
+  }, [from, item]);
 
   if (loading) {
     return (

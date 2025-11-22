@@ -328,7 +328,7 @@ export function HomeClient() {
         ) : items.length === 0 ? (
           <p className="text-sm text-gray-500 col-span-full">{isSomeday ? "いつか欲しいリストのアイテムはありません。" : "この月のアイテムはありません。"}</p>
         ) : (
-          items.map((item) => <WishlistCard key={item.id} item={item} />)
+          items.map((item) => <WishlistCard key={item.id} item={item} from={isSomeday ? 'someday' : month} />)
         )}
       </section>
     </div>

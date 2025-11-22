@@ -25,13 +25,14 @@ function formatDate(value?: string | null) {
   return date.toLocaleDateString("ja-JP");
 }
 
-export function WishlistCard({ item }: { item: WishlistItem }) {
+export function WishlistCard({ item, from }: { item: WishlistItem; from?: string }) {
   const router = useRouter();
   const grayscale = item.is_purchased ? "grayscale" : "";
   const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
 
   const handleCardClick = () => {
-    router.push(`/item/${item.id}`);
+    const url = from ? `/item/${item.id}?from=${encodeURIComponent(from)}` : `/item/${item.id}`;
+    router.push(url);
   };
 
   return (
