@@ -199,69 +199,80 @@ export function HomeClient() {
       {/* 月選択とフィルター */}
       <div className="flex justify-between items-center mb-4">
         {/* 月選択 */}
-        <div className="relative flex items-center gap-1" ref={pickerRef}>
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="font-medium text-gray-700 hover:text-blue-600 hover:underline"
-          >
-            {pickerYear}年
-          </button>
+        <div className="relative" ref={pickerRef}>
+          {/* プルダウンボタン */}
           <button
             type="button"
             onClick={() => setPickerOpen((prev) => !prev)}
-            className="text-gray-700 hover:text-blue-600"
+            className="flex items-center gap-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black"
             aria-haspopup="dialog"
             aria-expanded={pickerOpen}
           >
+            <span>{pickerYear}</span>
             {pickerOpen ? (
-              <ChevronDown size={20} />
+              <ChevronDown size={16} />
             ) : (
-              <ChevronRight size={20} />
+              <ChevronRight size={16} />
             )}
           </button>
+          
+          {/* カレンダー（開いてる時だけ表示） */}
           {pickerOpen && (
-            <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-[20px] border border-gray-200 bg-white p-5 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between gap-4">
+            <div className="absolute left-0 z-40 mt-2 w-[220px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+              {/* 年の切り替え */}
+              <div className="flex items-center justify-between mb-4">
                 <button
                   type="button"
-                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
                   onClick={() => setPickerYear((prev) => Math.max(startYear, prev - 1))}
                   disabled={pickerYear <= startYear}
+                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                   aria-label="前年へ"
                 >
                   <ChevronLeft size={20} className="text-gray-700" />
                 </button>
-                <div className="text-base font-semibold text-gray-900">{pickerYear}</div>
                 <button
                   type="button"
-                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400"
+                  onClick={() => {
+                    router.push('/');
+                    setPickerOpen(false);
+                  }}
+                  className="font-medium text-gray-900 hover:text-blue-600 hover:underline"
+                >
+                  {pickerYear}年
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPickerYear((prev) => Math.min(endYear, prev + 1))}
                   disabled={pickerYear >= endYear}
+                  className="rounded px-3 py-2 text-base font-semibold hover:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                   aria-label="翌年へ"
                 >
                   <ChevronRight size={20} className="text-gray-700" />
                 </button>
               </div>
+              
+              {/* 月の選択 */}
               <div className="grid grid-cols-4 gap-2">
-                {Array.from({ length: 12 }).map((_, idx) => {
-                  const monthNumber = idx + 1;
-                  const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, "0")}`;
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => {
+                  const monthNumber = m;
+                  const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, '0')}`;
                   const isSelected = pickerMonth === monthNumber;
                   return (
                     <button
+                      key={m}
                       type="button"
-                      key={monthValue}
                       onClick={() => {
                         setPickerMonth(monthNumber);
                         handleMonthChange(monthValue);
                         setPickerOpen(false);
                       }}
-                      className={`rounded px-2 py-2 text-xs font-semibold ${
-                        isSelected ? "bg-black text-white" : "hover:bg-gray-100"
+                      className={`px-3 py-2 rounded text-xs font-semibold ${
+                        isSelected
+                          ? "bg-black text-white"
+                          : "hover:bg-blue-50"
                       }`}
                     >
-                      {monthNumber}
+                      {m}
                     </button>
                   );
                 })}
