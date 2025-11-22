@@ -20,19 +20,48 @@ function formatDate(value?: string | null) {
   return date.toLocaleDateString("ja-JP");
 }
 
-async function AllItemsPage() {
+async function AllItemsPage({ sort }: { sort: string }) {
   const supabase = await createSupabaseRSCClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   // データ取得: 未購入かつ「いつか欲しいリスト」以外
-  const { data: items } = await supabase
+  let query = supabase
     .from("wishlist")
     .select("*")
     .eq("user_id", user.id)
     .eq("is_purchased", false)
-    .eq("is_someday", false)
-    .order("created_at", { ascending: false });
+    .eq("is_someday", false);
+
+  // 並び替え
+  switch (sort) {
+    case "created-desc":
+    case "created":
+      query = query.order("created_at", { ascending: false });
+      break;
+    case "priority-desc":
+      query = query.order("priority", { ascending: false });
+      break;
+    case "priority-asc":
+      query = query.order("priority", { ascending: true });
+      break;
+    case "price-desc":
+      query = query.order("price", { ascending: false, nullsFirst: true as any });
+      break;
+    case "price-asc":
+      query = query.order("price", { ascending: true, nullsFirst: true as any });
+      break;
+    case "deadline-asc":
+      query = query.order("deadline", { ascending: true, nullsFirst: true as any });
+      break;
+    case "deadline-desc":
+      query = query.order("deadline", { ascending: false, nullsFirst: true as any });
+      break;
+    default:
+      query = query.order("created_at", { ascending: false });
+  }
+
+  const { data: items } = await query;
 
   return (
     <div className="container mx-auto p-4">
@@ -143,6 +172,7 @@ export default async function Home({
   }
 
   const month = params.month as string | undefined;
+  const sort = (params.sort as string | undefined) || "created-desc";
 
   if (month) {
     console.log('[HomePage Server] Month is specified:', month);
@@ -171,7 +201,7 @@ export default async function Home({
   return (
     <>
       <OAuthRedirectHandler />
-      <AllItemsPage />
+      <AllItemsPage sort={sort} />
     </>
   );
 }
