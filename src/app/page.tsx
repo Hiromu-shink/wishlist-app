@@ -25,13 +25,12 @@ async function AllItemsPage({ sort }: { sort: string }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // データ取得: 未購入かつ「いつか欲しいリスト」以外
+  // データ取得: 未購入の全てのアイテム（月別 + Saved）
   let query = supabase
     .from("wishlist")
     .select("*")
     .eq("user_id", user.id)
-    .eq("is_purchased", false)
-    .eq("is_someday", false);
+    .eq("is_purchased", false);
 
   // 並び替え
   switch (sort) {
