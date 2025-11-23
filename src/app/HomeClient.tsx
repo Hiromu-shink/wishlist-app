@@ -256,7 +256,8 @@ export function HomeClient() {
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => {
                   const monthNumber = m;
                   const monthValue = `${pickerYear}-${String(monthNumber).padStart(2, '0')}`;
-                  const isSelected = pickerMonth === monthNumber;
+                  // いつか欲しいリストの場合は選択状態にしない
+                  const isSelected = !isSomeday && pickerMonth === monthNumber;
                   return (
                     <button
                       key={m}
