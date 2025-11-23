@@ -204,11 +204,11 @@ export function HomeClient() {
           <button
             type="button"
             onClick={() => setPickerOpen((prev) => !prev)}
-            className="flex items-center gap-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="flex items-center gap-1 text-gray-700 hover:text-blue-600 focus:outline-none"
             aria-haspopup="dialog"
             aria-expanded={pickerOpen}
           >
-            <span>{pickerYear}</span>
+            <span className="font-medium">{pickerYear}</span>
             {pickerOpen ? (
               <ChevronDown size={16} />
             ) : (
