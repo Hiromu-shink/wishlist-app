@@ -158,12 +158,7 @@ export default function NewPage() {
 
   return (
     <div className="mx-auto max-w-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold">欲しいもの登録</h1>
-        <button type="button" onClick={() => router.push('/')} className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-          トップへ戻る
-        </button>
-      </div>
+      <h1 className="text-xl font-semibold mb-4">欲しいもの登録</h1>
       <form className="space-y-5 text-sm" onSubmit={onSubmit}>
         <div className="space-y-3">
           <div>

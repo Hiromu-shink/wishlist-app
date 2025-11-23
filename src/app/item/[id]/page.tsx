@@ -268,15 +268,7 @@ export default function ItemDetailPage() {
       )}
       {!editing ? (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-start gap-2">
-            <h1 className="flex-1 text-2xl font-semibold break-words">{item.name}</h1>
-            <button
-              onClick={() => router.back()}
-              className={`${buttonWhite} flex-shrink-0 min-w-[120px]`}
-            >
-              戻る
-            </button>
-          </div>
+          <h1 className="text-2xl font-semibold break-words">{item.name}</h1>
 
           {item.image_url && (
             <div className="w-full h-64 bg-gray-100 rounded overflow-hidden">
