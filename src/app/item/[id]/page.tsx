@@ -224,10 +224,10 @@ export default function ItemDetailPage() {
   const breadcrumbItems = useMemo(() => {
     if (!item) return [];
     
-    const items: Array<{ label: string; href?: string }> = [{ label: 'ホーム', href: '/' }];
+    const items: Array<{ label: string; href?: string }> = [{ label: 'Home', href: '/' }];
     
     if (from === 'someday') {
-      items.push({ label: 'いつか欲しいリスト', href: '/someday' });
+      items.push({ label: 'Saved', href: '/someday' });
     } else if (from) {
       // 月別ページ（例: 2025-11）
       try {

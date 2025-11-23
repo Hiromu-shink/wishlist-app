@@ -176,14 +176,14 @@ export function HomeClient() {
   const breadcrumbItems = useMemo(() => {
     if (isSomeday) {
       return [
-        { label: 'ホーム', href: '/' },
-        { label: 'いつか欲しいリスト' }
+        { label: 'Home', href: '/' },
+        { label: 'Saved' }
       ];
     } else if (month) {
       const monthDate = new Date(`${month}-01`);
       const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
       return [
-        { label: 'ホーム', href: '/' },
+        { label: 'Home', href: '/' },
         { label: monthLabel }
       ];
     }
@@ -313,14 +313,23 @@ export function HomeClient() {
           )}
         </div>
       </div>
-      {!isSomeday && (
-        <div className="flex items-center justify-between text-sm text-gray-700">
-          <div>月合計(購入済み除外): <span className="font-semibold">{total.toLocaleString()}円</span></div>
-        </div>
+      {!isSomeday && month && (
+        <>
+          <h1 className="text-2xl font-bold mb-2">
+            {(() => {
+              const date = new Date(`${month}-01`);
+              return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+            })()}
+          </h1>
+          <p className="text-gray-600 mb-4">月合計: ¥{total.toLocaleString()}</p>
+        </>
       )}
 
       {isSomeday && (
-        <h2 className="text-lg font-semibold text-gray-900">いつか欲しいものリスト</h2>
+        <>
+          <h1 className="text-2xl font-bold mb-2">Saved</h1>
+          <p className="text-gray-600 mb-4">Total: {items.length}</p>
+        </>
       )}
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

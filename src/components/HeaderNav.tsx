@@ -60,35 +60,35 @@ export function HeaderNav() {
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  いつか欲しいリスト
+                  保存済み（Saved）
                 </Link>
                 <Link
                   href="/purchased"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  購入済みリスト
+                  購入済み
                 </Link>
                 <Link
                   href="/trash"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  削除済みアイテム
+                  削除済み
                 </Link>
                 <Link
                   href="/stats"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  統計・ダッシュボード
+                  統計
                 </Link>
                 <Link
                   href="/account"
                   className={menuItem}
                   onClick={() => setMenuOpen(false)}
                 >
-                  アカウント情報
+                  アカウント
                 </Link>
                 <LogoutButton
                   variant="menu"

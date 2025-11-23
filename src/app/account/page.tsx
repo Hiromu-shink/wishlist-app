@@ -10,12 +10,12 @@ export default async function AccountPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   return (
-    <div className="mx-auto max-w-md p-6 space-y-6">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       <Breadcrumb items={[
-        { label: 'ホーム', href: '/' },
-        { label: 'アカウント情報' }
+        { label: 'Home', href: '/' },
+        { label: 'アカウント' }
       ]} />
-      <h1 className="text-xl font-semibold">アカウント情報</h1>
+      <h1 className="text-2xl font-bold">アカウント</h1>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">メールアドレス</span>

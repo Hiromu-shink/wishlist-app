@@ -65,8 +65,8 @@ async function AllItemsPage({ sort }: { sort: string }) {
 
   return (
     <div className="container mx-auto px-4 py-4">
-      <h1 className="text-2xl font-bold mb-4">欲しいものリスト</h1>
-      <p className="text-gray-600 mb-4">全ての欲しいもの（{items?.length || 0}個）</p>
+      <h1 className="text-2xl font-bold mb-2">Wishlist</h1>
+      <p className="text-gray-600 mb-4">Total: {items?.length || 0}</p>
 
       <HomeMonthPicker />
 
