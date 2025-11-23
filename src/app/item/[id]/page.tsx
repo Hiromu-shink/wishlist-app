@@ -231,10 +231,13 @@ export default function ItemDetailPage() {
     } else if (from) {
       // 月別ページ（例: 2025-11）
       try {
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const date = new Date(`${from}-01`);
         if (!isNaN(date.getTime())) {
-          const monthName = date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
-          items.push({ label: monthName, href: `/?month=${from}` });
+          const monthName = monthNames[date.getMonth()];
+          const year = date.getFullYear();
+          const monthLabel = `${monthName} ${year}`;
+          items.push({ label: monthLabel, href: `/?month=${from}` });
         }
       } catch (e) {
         // 日付の解析に失敗した場合は無視

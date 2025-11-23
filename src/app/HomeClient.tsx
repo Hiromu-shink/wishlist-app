@@ -180,8 +180,11 @@ export function HomeClient() {
         { label: 'Saved' }
       ];
     } else if (month) {
-      const monthDate = new Date(`${month}-01`);
-      const monthLabel = monthDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const date = new Date(`${month}-01`);
+      const monthName = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+      const monthLabel = `${monthName} ${year}`;
       return [
         { label: 'Home', href: '/' },
         { label: monthLabel }
@@ -317,8 +320,11 @@ export function HomeClient() {
         <>
           <h1 className="text-2xl font-bold mb-2">
             {(() => {
+              const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
               const date = new Date(`${month}-01`);
-              return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+              const monthName = monthNames[date.getMonth()];
+              const year = date.getFullYear();
+              return `${monthName} ${year}`;
             })()}
           </h1>
           <p className="text-gray-600 mb-4">月合計: ¥{total.toLocaleString()}</p>
