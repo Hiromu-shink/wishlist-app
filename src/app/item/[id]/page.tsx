@@ -271,9 +271,9 @@ export default function ItemDetailPage() {
           <h1 className="text-2xl font-semibold break-words">{item.name}</h1>
 
           {item.image_url && (
-            <div className="w-full h-64 bg-gray-100 rounded overflow-hidden">
+            <div className="w-full bg-gray-100 rounded overflow-hidden flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.image_url} alt={item.name} className="object-cover w-full h-full" />
+              <img src={item.image_url} alt={item.name} className="w-full h-auto object-contain max-h-96" />
             </div>
           )}
           
