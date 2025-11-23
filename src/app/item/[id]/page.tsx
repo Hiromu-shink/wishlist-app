@@ -213,7 +213,7 @@ export default function ItemDetailPage() {
       try {
         await deleteWishlistItem(id);
         push("削除しました");
-        router.push("/");
+        router.back();
       } catch (error: any) {
         push(error.message || "削除に失敗しました");
       }
