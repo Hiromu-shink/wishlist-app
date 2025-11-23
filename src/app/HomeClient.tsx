@@ -191,7 +191,7 @@ export function HomeClient() {
   }, [month, isSomeday]);
 
   return (
-    <div className="mx-auto max-w-6xl p-6 space-y-6">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       {breadcrumbItems.length > 0 && (
         <Breadcrumb items={breadcrumbItems} />
       )}

@@ -157,7 +157,7 @@ export default function NewPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl p-6">
+    <div className="container mx-auto px-4 py-6">
       <h1 className="text-xl font-semibold mb-4">欲しいもの登録</h1>
       <form className="space-y-5 text-sm" onSubmit={onSubmit}>
         <div className="space-y-3">
