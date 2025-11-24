@@ -158,8 +158,9 @@ export default function NewPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-xl font-semibold mb-4">欲しいもの登録</h1>
-      <form className="space-y-5 text-sm" onSubmit={onSubmit}>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-xl font-semibold mb-4">欲しいもの登録</h1>
+        <form className="space-y-5 text-sm" onSubmit={onSubmit}>
         <div className="space-y-3">
           <div>
             <label htmlFor="name" className="block font-medium text-gray-700">登録名</label>
@@ -329,6 +330,7 @@ export default function NewPage() {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

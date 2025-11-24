@@ -265,11 +265,12 @@ export default function ItemDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      {breadcrumbItems.length > 0 && (
-        <Breadcrumb items={breadcrumbItems} />
-      )}
-      {!editing ? (
+    <div className="container mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto space-y-6">
+        {breadcrumbItems.length > 0 && (
+          <Breadcrumb items={breadcrumbItems} />
+        )}
+        {!editing ? (
         <div className="space-y-4">
           <h1 className="text-2xl font-semibold break-words">{item.name}</h1>
 
@@ -522,6 +523,7 @@ export default function ItemDetailPage() {
           </div>
         </form>
       )}
+      </div>
     </div>
   );
 }
