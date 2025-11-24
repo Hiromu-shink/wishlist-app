@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useMemo } from "react";
+import { useEffect, useState, useTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
@@ -19,7 +19,7 @@ function formatDate(value?: string | null) {
   return date.toLocaleDateString("ja-JP");
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -179,5 +179,22 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: '検索' }
+        ]} />
+        <h1 className="text-2xl font-bold mb-2">検索結果</h1>
+        <p className="text-sm text-gray-500">読み込み中...</p>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }
