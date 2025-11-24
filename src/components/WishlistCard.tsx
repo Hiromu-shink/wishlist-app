@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { WishlistItem } from "@/types/wishlist";
+import { ItemImage } from "@/components/ItemImage";
 
 function Stars({ n }: { n: number }) {
   return (
@@ -49,11 +50,16 @@ export function WishlistCard({ item, from }: { item: WishlistItem; from?: string
       }}
     >
       <div className="flex h-full flex-col p-4 text-left">
-        <div className="relative w-full h-[200px] overflow-hidden rounded-md bg-white">
+        <div className="relative w-full h-[200px] overflow-hidden rounded-md">
           {item.image_url ? (
-            <img src={item.image_url} alt={item.name} className="h-full w-full object-contain object-center p-2" />
+            <ItemImage
+              imageUrl={item.image_url}
+              alt={item.name}
+              className="h-full w-full object-contain object-center p-2"
+              containerClassName="h-[200px] rounded-md"
+            />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">
+            <div className="flex h-full w-full items-center justify-center text-sm text-[#999] bg-white">
               No Image
             </div>
           )}

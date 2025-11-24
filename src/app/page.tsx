@@ -4,6 +4,7 @@ import { createSupabaseRSCClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { OAuthRedirectHandler } from "@/components/OAuthRedirectHandler";
 import { HomeMonthPicker } from "@/components/HomeMonthPicker";
+import { ItemImage } from "@/components/ItemImage";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -77,15 +78,16 @@ async function AllItemsPage({ sort }: { sort: string }) {
             className="border border-[#dddddd] rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white flex flex-col"
           >
             {/* 画像 */}
-            <div className="relative h-32 overflow-hidden bg-white">
+            <div className="relative h-32 overflow-hidden">
               {item.image_url ? (
-                <img
-                  src={item.image_url}
+                <ItemImage
+                  imageUrl={item.image_url}
                   alt={item.name}
                   className="w-full h-full object-contain object-center p-2"
+                  containerClassName="h-32"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center bg-white">
                   <span className="text-xs text-gray-400">No Image</span>
                 </div>
               )}
