@@ -1,7 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { WishlistItem } from "@/types/wishlist";
+import { togglePurchased } from "@/app/actions/wishlist";
+import { useToast } from "@/components/ui/ToastProvider";
 
 function Stars({ n }: { n: number }) {
   return (
@@ -27,12 +30,28 @@ function formatDate(value?: string | null) {
 
 export function WishlistCard({ item, from }: { item: WishlistItem; from?: string }) {
   const router = useRouter();
+  const { push } = useToast();
+  const [pending, startTransition] = useTransition();
   const grayscale = item.is_purchased ? "grayscale" : "";
   const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
+  const showUnpurchaseButton = from === "purchased" && item.is_purchased;
 
   const handleCardClick = () => {
     const url = from ? `/item/${item.id}?from=${encodeURIComponent(from)}` : `/item/${item.id}`;
     router.push(url);
+  };
+
+  const handleUnpurchase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    startTransition(async () => {
+      try {
+        await togglePurchased(item.id, false);
+        push("購入済みを解除しました");
+        router.refresh();
+      } catch (error: any) {
+        push(error.message || "解除に失敗しました");
+      }
+    });
   };
 
   return (
@@ -72,6 +91,15 @@ export function WishlistCard({ item, from }: { item: WishlistItem; from?: string
                 ? `期限: ${formatDate(item.deadline)}`
                 : "期限: 未定"}
             </span>
+            {showUnpurchaseButton && (
+              <button
+                onClick={handleUnpurchase}
+                disabled={pending}
+                className="mt-2 px-3 py-1 border rounded text-xs disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-black hover:bg-gray-50"
+              >
+                {pending ? "処理中..." : "購入済みを解除"}
+              </button>
+            )}
           </div>
         </div>
       </div>
