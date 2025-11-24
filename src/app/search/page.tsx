@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useTransition, Suspense } from "react";
+import { useEffect, useState, useTransition, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import type { WishlistItem } from "@/types/wishlist";
 import Link from "next/link";
+import { FilterMenu } from "@/components/FilterMenu";
+import { filterItems, sortItems } from "@/lib/filters";
 
 function formatPrice(price: number | null): string {
   if (price === null || price === undefined) return "¥-";
@@ -24,14 +26,25 @@ function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [allItems, setAllItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
+
+  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const deadline = (searchParams.get("deadline") as any) || "all";
+  const priceRange = (searchParams.get("priceRange") as any) || "all";
+  const priority = (searchParams.get("priority") as any) || "all";
+
+  // フィルターとソートを適用
+  const items = useMemo(() => {
+    let filtered = filterItems(allItems, { deadline, priceRange, priority });
+    return sortItems(filtered, sort);
+  }, [allItems, sort, deadline, priceRange, priority]);
 
   // デバウンス処理（500ms待機）
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setItems([]);
+      setAllItems([]);
       setIsLoading(false);
       return;
     }
@@ -60,10 +73,10 @@ function SearchContent() {
             .order("created_at", { ascending: false });
 
           if (error) throw error;
-          setItems((data ?? []) as WishlistItem[]);
+          setAllItems((data ?? []) as WishlistItem[]);
         } catch (error) {
           console.error("[SearchPage] Failed to search items:", error);
-          setItems([]);
+          setAllItems([]);
         } finally {
           setIsLoading(false);
         }
@@ -93,8 +106,18 @@ function SearchContent() {
         { label: '検索' }
       ]} />
 
-      {/* タイトル */}
-      <h1 className="text-2xl font-bold mb-2">検索結果</h1>
+      {/* タイトルとフィルター */}
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">検索結果</h1>
+          {searchQuery.trim() && (
+            <p className="text-gray-600">
+              "{searchQuery}" の検索結果: {items.length}件
+            </p>
+          )}
+        </div>
+        <FilterMenu preserveParams={["q"]} />
+      </div>
 
       {/* 検索バー */}
       <div className="mb-4">
@@ -107,13 +130,6 @@ function SearchContent() {
           autoFocus
         />
       </div>
-
-      {/* サブタイトル */}
-      {searchQuery.trim() && (
-        <p className="text-gray-600 mb-4">
-          "{searchQuery}" の検索結果: {items.length}件
-        </p>
-      )}
 
       {/* 検索結果 */}
       {!searchQuery.trim() ? (

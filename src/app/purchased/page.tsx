@@ -1,17 +1,31 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { FilterMenu } from "@/components/FilterMenu";
+import { filterItems, sortItems } from "@/lib/filters";
 
 export default function PurchasedPage() {
   const router = useRouter();
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  const searchParams = useSearchParams();
+  const [allItems, setAllItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
+
+  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const deadline = (searchParams.get("deadline") as any) || "all";
+  const priceRange = (searchParams.get("priceRange") as any) || "all";
+  const priority = (searchParams.get("priority") as any) || "all";
+
+  // フィルターとソートを適用
+  const items = useMemo(() => {
+    let filtered = filterItems(allItems, { deadline, priceRange, priority });
+    return sortItems(filtered, sort);
+  }, [allItems, sort, deadline, priceRange, priority]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -36,11 +50,11 @@ export default function PurchasedPage() {
             .order("purchased_date", { ascending: false, nullsFirst: false });
 
           if (error) throw error;
-          setItems((data ?? []) as WishlistItem[]);
+          setAllItems((data ?? []) as WishlistItem[]);
         }
       } catch (error) {
         console.error("[PurchasedPage] Failed to load items:", error);
-        setItems([]);
+        setAllItems([]);
       } finally {
         setIsLoading(false);
       }
@@ -55,11 +69,14 @@ export default function PurchasedPage() {
         { label: '購入済み' }
       ]} />
       
-      {/* タイトル */}
-      <h1 className="text-2xl font-bold mb-2">購入済み</h1>
-
-      {/* サブタイトル */}
-      <p className="text-gray-600 mb-4">Total: {items.length}</p>
+      {/* タイトルとフィルター */}
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">購入済み</h1>
+          <p className="text-gray-600">Total: {items.length}</p>
+        </div>
+        <FilterMenu preserveParams={[]} />
+      </div>
 
       {/* アイテム一覧 */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

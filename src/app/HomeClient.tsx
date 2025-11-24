@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ChevronDown, ListFilter } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { FilterMenu } from "@/components/FilterMenu";
+import { filterItems, sortItems } from "@/lib/filters";
 
 const buttonBase = "h-10 px-4 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-black";
 const startYear = 2025;
@@ -21,14 +23,17 @@ export function HomeClient() {
   const router = useRouter();
   const monthParam = searchParams.get("month");
   const month = monthParam || currentMonth();
-  const sort = searchParams.get("sort") || "created-desc";
+  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const deadline = (searchParams.get("deadline") as any) || "all";
+  const priceRange = (searchParams.get("priceRange") as any) || "all";
+  const priority = (searchParams.get("priority") as any) || "all";
   const isSomeday = month === "someday";
   
   console.log('[HomeClient] Received month param:', monthParam);
   console.log('[HomeClient] Using month:', month);
   console.log('[HomeClient] isSomeday:', isSomeday);
   
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [allItems, setAllItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
   const fallbackMonth = useMemo(() => currentMonth(), []);
@@ -45,6 +50,12 @@ export function HomeClient() {
     const m = Number(source.split("-")[1]);
     return Number.isFinite(m) ? m : 1;
   });
+
+  // フィルターとソートを適用
+  const items = useMemo(() => {
+    let filtered = filterItems(allItems, { deadline, priceRange, priority });
+    return sortItems(filtered, sort);
+  }, [allItems, sort, deadline, priceRange, priority]);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -118,56 +129,24 @@ export function HomeClient() {
         if (!res.ok) throw new Error(`failed: ${res.status}`);
         const data = await res.json();
         console.log('[HomeClient] Received items count:', data?.items?.length ?? 0);
-        setItems((data?.items ?? []) as WishlistItem[]);
+        setAllItems((data?.items ?? []) as WishlistItem[]);
       } catch (error) {
         console.error("[HomeClient] Failed to load items:", error);
-        setItems([]);
+        setAllItems([]);
       } finally {
         setIsLoading(false);
       }
     });
-  }, [month, sort, router]);
+  }, [month, router]);
 
   // 合計計算: 購入済みと未定アイテムを除外
   const total = items.filter((i) => !i.is_purchased && !i.is_someday).reduce((sum, i) => sum + Number(i.price ?? 0), 0);
-
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const filterRef = useRef<HTMLDivElement | null>(null);
 
   function handleMonthChange(newMonth: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("month", newMonth);
     router.push(`/?${params.toString()}`);
   }
-
-  function handleSortChange(newSort: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (month) params.set("month", month);
-    params.set("sort", newSort);
-    router.push(`/?${params.toString()}`);
-    setShowFilterMenu(false);
-  }
-
-  useEffect(() => {
-    if (!showFilterMenu) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setShowFilterMenu(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showFilterMenu]);
-
-  const sortOptions = [
-    { value: "created-desc", label: "新着順" },
-    { value: "priority-desc", label: "優先度 ▼" },
-    { value: "priority-asc", label: "優先度 ▲" },
-    { value: "price-desc", label: "価格 ▼" },
-    { value: "price-asc", label: "価格 ▲" },
-    { value: "deadline-asc", label: "期限 ▲" },
-    { value: "deadline-desc", label: "期限 ▼" },
-  ];
 
   // モバイルでもPCと同じデスクトップピッカーを使用
   // これにより、選択した瞬間に遷移し、確実に動作する
@@ -313,35 +292,7 @@ export function HomeClient() {
         </div>
 
         {/* フィルター */}
-        <div className="relative" ref={filterRef}>
-          <button
-            type="button"
-            onClick={() => setShowFilterMenu((prev) => !prev)}
-            className="text-gray-700 hover:text-blue-600"
-            aria-haspopup="menu"
-            aria-expanded={showFilterMenu}
-          >
-            <ListFilter size={20} />
-          </button>
-          {showFilterMenu && (
-            <div className="absolute right-0 z-40 mt-2 w-44 overflow-hidden rounded-lg border bg-white shadow-lg">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => handleSortChange(option.value)}
-                  className={`block w-full px-4 py-2 text-left text-sm ${
-                    sort === option.value
-                      ? "bg-gray-100 font-semibold text-gray-900"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <FilterMenu preserveParams={["month"]} />
       </div>
 
       {/* アイテム一覧 */}

@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { restoreWishlistItem, permanentlyDeleteWishlistItem } from "@/app/actions/wishlist";
 import { useToast } from "@/components/ui/ToastProvider";
+import { FilterMenu } from "@/components/FilterMenu";
+import { filterItems, sortItems } from "@/lib/filters";
 
 function formatDate(value?: string | null) {
   if (!value) return null;
@@ -26,10 +28,22 @@ function getDeletionDate(deletedAt: string | null | undefined): string | null {
 
 export default function TrashPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { push } = useToast();
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [allItems, setAllItems] = useState<WishlistItem[]>([]);
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
+
+  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const deadline = (searchParams.get("deadline") as any) || "all";
+  const priceRange = (searchParams.get("priceRange") as any) || "all";
+  const priority = (searchParams.get("priority") as any) || "all";
+
+  // フィルターとソートを適用
+  const items = useMemo(() => {
+    let filtered = filterItems(allItems, { deadline, priceRange, priority });
+    return sortItems(filtered, sort);
+  }, [allItems, sort, deadline, priceRange, priority]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -53,11 +67,11 @@ export default function TrashPage() {
             .order("deleted_at", { ascending: false, nullsFirst: false });
 
           if (error) throw error;
-          setItems((data ?? []) as WishlistItem[]);
+          setAllItems((data ?? []) as WishlistItem[]);
         }
       } catch (error) {
         console.error("[TrashPage] Failed to load items:", error);
-        setItems([]);
+        setAllItems([]);
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +84,7 @@ export default function TrashPage() {
         await restoreWishlistItem(id);
         push("復元しました");
         // リストから削除
-        setItems(items.filter(item => item.id !== id));
+        setAllItems(allItems.filter(item => item.id !== id));
         router.refresh();
       } catch (error: any) {
         push(error.message || "復元に失敗しました");
@@ -85,7 +99,7 @@ export default function TrashPage() {
         await permanentlyDeleteWishlistItem(id);
         push("完全に削除しました");
         // リストから削除
-        setItems(items.filter(item => item.id !== id));
+        setAllItems(allItems.filter(item => item.id !== id));
       } catch (error: any) {
         push(error.message || "削除に失敗しました");
       }
@@ -100,11 +114,14 @@ export default function TrashPage() {
         { label: '削除済み' }
       ]} />
       
-      {/* タイトル */}
-      <h1 className="text-2xl font-bold mb-2">削除済み</h1>
-
-      {/* サブタイトル */}
-      <p className="text-gray-600 mb-4">Total: {items.length}</p>
+      {/* タイトルとフィルター */}
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">削除済み</h1>
+          <p className="text-gray-600">Total: {items.length}</p>
+        </div>
+        <FilterMenu preserveParams={[]} />
+      </div>
 
       {/* 注意文 */}
       <p className="text-sm text-amber-600 mb-4">⚠️ 30日後に自動削除されます</p>

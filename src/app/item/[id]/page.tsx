@@ -59,6 +59,34 @@ export default function ItemDetailPage() {
     is_someday: false,
   });
 
+  // パンくずリストの生成（useMemoは常に同じ位置で呼ばれる必要がある）
+  const breadcrumbItems = useMemo(() => {
+    if (!item) return [];
+    
+    const items: Array<{ label: string; href?: string }> = [{ label: 'Home', href: '/' }];
+    
+    if (from === 'someday') {
+      items.push({ label: 'Saved', href: '/someday' });
+    } else if (from) {
+      // 月別ページ（例: 2025-11）
+      try {
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const date = new Date(`${from}-01`);
+        if (!isNaN(date.getTime())) {
+          const monthName = monthNames[date.getMonth()];
+          const year = date.getFullYear();
+          const monthLabel = `${monthName} ${year}`;
+          items.push({ label: monthLabel, href: `/?month=${from}` });
+        }
+      } catch (e) {
+        // 日付の解析に失敗した場合は無視
+      }
+    }
+    
+    items.push({ label: item.name });
+    return items;
+  }, [from, item]);
+
   useEffect(() => {
     if (!file) {
       setUploadedPreview(null);
@@ -219,34 +247,6 @@ export default function ItemDetailPage() {
       }
     });
   }
-
-  // パンくずリストの生成
-  const breadcrumbItems = useMemo(() => {
-    if (!item) return [];
-    
-    const items: Array<{ label: string; href?: string }> = [{ label: 'Home', href: '/' }];
-    
-    if (from === 'someday') {
-      items.push({ label: 'Saved', href: '/someday' });
-    } else if (from) {
-      // 月別ページ（例: 2025-11）
-      try {
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const date = new Date(`${from}-01`);
-        if (!isNaN(date.getTime())) {
-          const monthName = monthNames[date.getMonth()];
-          const year = date.getFullYear();
-          const monthLabel = `${monthName} ${year}`;
-          items.push({ label: monthLabel, href: `/?month=${from}` });
-        }
-      } catch (e) {
-        // 日付の解析に失敗した場合は無視
-      }
-    }
-    
-    items.push({ label: item.name });
-    return items;
-  }, [from, item]);
 
   if (loading) {
     return (
