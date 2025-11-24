@@ -13,5 +13,7 @@ export type WishlistItem = {
   month: string; // e.g. "2024-11"
   created_at: string; // ISO timestamp
   is_someday: boolean; // 未定（いつか欲しい）
+  deleted?: boolean; // 削除フラグ
+  deleted_at?: string | null; // ISO timestamp
 };
 

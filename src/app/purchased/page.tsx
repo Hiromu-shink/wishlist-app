@@ -32,6 +32,7 @@ export default function PurchasedPage() {
             .select("*")
             .eq("user_id", session.user.id)
             .eq("is_purchased", true)
+            .or("deleted.is.null,deleted.eq.false")
             .order("purchased_date", { ascending: false, nullsFirst: false });
 
           if (error) throw error;

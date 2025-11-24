@@ -30,7 +30,8 @@ async function AllItemsPage({ sort }: { sort: string }) {
     .from("wishlist")
     .select("*")
     .eq("user_id", user.id)
-    .eq("is_purchased", false);
+    .eq("is_purchased", false)
+    .or("deleted.is.null,deleted.eq.false");
 
   // 並び替え
   switch (sort) {

@@ -25,7 +25,11 @@ export async function GET(request: Request) {
 		console.log('[API Wishlist] month param:', month);
 		console.log('[API Wishlist] Sort:', sort);
 
-		let query = supabase.from("wishlist").select("*").eq("user_id", user.id);
+		let query = supabase
+			.from("wishlist")
+			.select("*")
+			.eq("user_id", user.id)
+			.or("deleted.is.null,deleted.eq.false");
 		if (month) query = query.eq("month", month);
 
 		// 並び替え（サーバー側で可能な範囲）

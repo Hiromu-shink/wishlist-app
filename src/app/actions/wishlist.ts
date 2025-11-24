@@ -98,9 +98,39 @@ export async function deleteWishlistItem(id: string) {
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
-  const { error } = await supabase.from("wishlist").delete().eq("id", id).eq("user_id", user.id);
+  // 完全削除ではなく、deletedフラグを設定
+  const { error } = await supabase
+    .from("wishlist")
+    .update({ deleted: true, deleted_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) throw error;
   revalidatePath("/");
+  revalidatePath("/trash");
+}
+
+export async function restoreWishlistItem(id: string) {
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+  const { error } = await supabase
+    .from("wishlist")
+    .update({ deleted: false, deleted_at: null })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/");
+  revalidatePath("/trash");
+}
+
+export async function permanentlyDeleteWishlistItem(id: string) {
+  const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+  // 完全削除
+  const { error } = await supabase.from("wishlist").delete().eq("id", id).eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/trash");
 }
 
 export async function togglePurchased(id: string, purchased: boolean, purchased_date?: string | null) {
@@ -160,7 +190,12 @@ export async function getWishlistItems(month: string, sort: string = "created-de
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
-  let query = supabase.from("wishlist").select("*").eq("month", month).eq("user_id", user.id);
+  let query = supabase
+    .from("wishlist")
+    .select("*")
+    .eq("month", month)
+    .eq("user_id", user.id)
+    .or("deleted.is.null,deleted.eq.false");
   if (sort === "created-desc" || sort === "created") {
     query = query.order("created_at", { ascending: false });
   }
@@ -217,7 +252,13 @@ export async function getSomedayItems() {
   const supabase = await (await import("@/lib/supabase/server")).createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
-  const { data, error } = await supabase.from("wishlist").select("*").eq("month", "someday").eq("user_id", user.id).order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("wishlist")
+    .select("*")
+    .eq("month", "someday")
+    .eq("user_id", user.id)
+    .or("deleted.is.null,deleted.eq.false")
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as any[]) ?? [];
 }
