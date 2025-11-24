@@ -82,7 +82,7 @@ async function AllItemsPage({ sort }: { sort: string }) {
                 <img
                   src={item.image_url}
                   alt={item.name}
-                  className="w-full h-full object-contain object-center"
+                  className="w-full h-full object-contain object-center p-2"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

@@ -51,7 +51,7 @@ export function WishlistCard({ item, from }: { item: WishlistItem; from?: string
       <div className="flex h-full flex-col p-4 text-left">
         <div className="relative w-full h-[200px] overflow-hidden rounded-md bg-white">
           {item.image_url ? (
-            <img src={item.image_url} alt={item.name} className="h-full w-full object-contain object-center" />
+            <img src={item.image_url} alt={item.name} className="h-full w-full object-contain object-center p-2" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">
               No Image
