@@ -2,14 +2,6 @@
 
 import { useState, useRef } from 'react';
 
-// ColorThiefの型定義
-declare module 'colorthief' {
-  export default class ColorThief {
-    getColor(img: HTMLImageElement | null, quality?: number): [number, number, number];
-    getPalette(img: HTMLImageElement | null, colorCount?: number, quality?: number): Array<[number, number, number]>;
-  }
-}
-
 interface ItemImageProps {
   imageUrl: string;
   alt: string;
