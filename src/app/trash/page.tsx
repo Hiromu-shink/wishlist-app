@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useMemo } from "react";
+import { useEffect, useState, useTransition, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
@@ -26,7 +26,7 @@ function getDeletionDate(deletedAt: string | null | undefined): string | null {
   return date.toISOString().slice(0, 10);
 }
 
-export default function TrashPage() {
+function TrashContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { push } = useToast();
@@ -190,5 +190,22 @@ export default function TrashPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function TrashPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: '削除済み' }
+        ]} />
+        <h1 className="text-2xl font-bold mb-2">削除済み</h1>
+        <p className="text-sm text-gray-500">読み込み中...</p>
+      </div>
+    }>
+      <TrashContent />
+    </Suspense>
   );
 }

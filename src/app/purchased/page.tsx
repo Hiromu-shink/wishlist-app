@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useMemo } from "react";
+import { useEffect, useState, useTransition, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WishlistCard } from "@/components/WishlistCard";
 import type { WishlistItem } from "@/types/wishlist";
@@ -9,7 +9,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { FilterMenu } from "@/components/FilterMenu";
 import { filterItems, sortItems } from "@/lib/filters";
 
-export default function PurchasedPage() {
+function PurchasedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [allItems, setAllItems] = useState<WishlistItem[]>([]);
@@ -89,5 +89,22 @@ export default function PurchasedPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function PurchasedPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: '購入済み' }
+        ]} />
+        <h1 className="text-2xl font-bold mb-2">購入済み</h1>
+        <p className="text-sm text-gray-500">読み込み中...</p>
+      </div>
+    }>
+      <PurchasedContent />
+    </Suspense>
   );
 }

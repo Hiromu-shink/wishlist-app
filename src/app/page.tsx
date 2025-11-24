@@ -134,7 +134,14 @@ export default async function Home({
   return (
     <>
       <OAuthRedirectHandler />
-      <AllItemsPage sort={sort} />
+      <Suspense fallback={
+        <div className="container mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold mb-2">Wishlist</h1>
+          <p className="text-sm text-gray-500">読み込み中...</p>
+        </div>
+      }>
+        <AllItemsPage sort={sort} />
+      </Suspense>
     </>
   );
 }
