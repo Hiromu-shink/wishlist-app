@@ -32,7 +32,7 @@ export function HeaderNav() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
       <div className="container mx-auto flex items-center justify-between px-4 py-4">
-        <Link href="/" className="text-xl font-bold hover:text-blue-600">
+        <Link href="/" className="text-2xl font-bold hover:text-blue-600">
           Wishlist
         </Link>
         <div className="flex items-center gap-2">
