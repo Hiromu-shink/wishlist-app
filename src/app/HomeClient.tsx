@@ -194,11 +194,38 @@ export function HomeClient() {
   }, [month, isSomeday]);
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="container mx-auto px-4 py-4">
+      {/* パンくずリスト */}
       {breadcrumbItems.length > 0 && (
         <Breadcrumb items={breadcrumbItems} />
       )}
       
+      {/* タイトル */}
+      {!isSomeday && month && (
+        <h1 className="text-2xl font-bold mb-2">
+          {(() => {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const date = new Date(`${month}-01`);
+            const monthName = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            return `${monthName} ${year}`;
+          })()}
+        </h1>
+      )}
+
+      {isSomeday && (
+        <h1 className="text-2xl font-bold mb-2">Saved</h1>
+      )}
+
+      {/* サブタイトル */}
+      {!isSomeday && month && (
+        <p className="text-gray-600 mb-4">月合計: ¥{total.toLocaleString()}</p>
+      )}
+
+      {isSomeday && (
+        <p className="text-gray-600 mb-4">Total: {items.length}</p>
+      )}
+
       {/* 月選択とフィルター */}
       <div className="flex justify-between items-center mb-4">
         {/* 月選択 */}
@@ -316,28 +343,8 @@ export function HomeClient() {
           )}
         </div>
       </div>
-      {!isSomeday && month && (
-        <>
-          <h1 className="text-2xl font-bold mb-2">
-            {(() => {
-              const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-              const date = new Date(`${month}-01`);
-              const monthName = monthNames[date.getMonth()];
-              const year = date.getFullYear();
-              return `${monthName} ${year}`;
-            })()}
-          </h1>
-          <p className="text-gray-600 mb-4">月合計: ¥{total.toLocaleString()}</p>
-        </>
-      )}
 
-      {isSomeday && (
-        <>
-          <h1 className="text-2xl font-bold mb-2">Saved</h1>
-          <p className="text-gray-600 mb-4">Total: {items.length}</p>
-        </>
-      )}
-
+      {/* アイテム一覧 */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading || pending ? (
           <p className="text-sm text-gray-500 col-span-full">読み込み中...</p>
