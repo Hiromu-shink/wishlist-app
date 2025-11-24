@@ -77,12 +77,12 @@ async function AllItemsPage({ sort }: { sort: string }) {
             className="border border-[#dddddd] rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white flex flex-col"
           >
             {/* 画像 */}
-            <div className="relative h-32 overflow-hidden bg-[#f0f0f0]">
+            <div className="relative h-32 overflow-hidden bg-white">
               {item.image_url ? (
                 <img
                   src={item.image_url}
                   alt={item.name}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-contain object-center"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
