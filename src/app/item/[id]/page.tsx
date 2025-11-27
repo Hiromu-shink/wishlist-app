@@ -316,23 +316,21 @@ export default function ItemDetailPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* 未購入アイテム: 期限のみ表示 */}
+          {!item.is_purchased && item.deadline && (
             <div>
-              <label className="text-sm text-gray-600">{item.is_purchased ? "購入" : "期限"}</label>
-              <p>
-                {item.is_purchased
-                  ? (item.purchased_date ? new Date(item.purchased_date).toLocaleDateString("ja-JP") : "-")
-                  : (item.deadline ? new Date(item.deadline).toLocaleDateString("ja-JP") : item.is_someday ? "未定" : "-")}
-              </p>
+              <label className="text-sm text-gray-600">期限:</label>
+              <span className="ml-2">{new Date(item.deadline).toLocaleDateString("ja-JP")}</span>
             </div>
+          )}
+
+          {/* 購入済みアイテム: 購入日のみ表示 */}
+          {item.is_purchased && item.purchased_date && (
             <div>
-              <label className="text-sm text-gray-600">状態</label>
-              <p>{item.is_purchased ? "購入済み" : "未購入"}</p>
-              {item.is_purchased && item.purchased_date && (
-                <p className="text-xs text-gray-500">購入日: {item.purchased_date}</p>
-              )}
+              <label className="text-sm text-gray-600">購入日:</label>
+              <span className="ml-2">{new Date(item.purchased_date).toLocaleDateString("ja-JP")}</span>
             </div>
-          </div>
+          )}
 
           <div className="mt-4 flex items-center justify-between">
             <button
