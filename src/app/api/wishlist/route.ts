@@ -29,6 +29,7 @@ export async function GET(request: Request) {
 			.from("wishlist")
 			.select("*")
 			.eq("user_id", user.id)
+			.eq("is_purchased", false)
 			.or("deleted.is.null,deleted.eq.false");
 		if (month) query = query.eq("month", month);
 
