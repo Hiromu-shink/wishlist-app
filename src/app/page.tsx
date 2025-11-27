@@ -3,66 +3,24 @@ import { HomeClient } from "./HomeClient";
 import { createSupabaseRSCClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { OAuthRedirectHandler } from "@/components/OAuthRedirectHandler";
-import { HomeMonthPicker } from "@/components/HomeMonthPicker";
 import { AllItemsClient } from "./AllItemsClient";
-import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-function formatPrice(price: number | null): string {
-  if (price === null || price === undefined) return "¥-";
-  return `¥${price.toLocaleString()}`;
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString("ja-JP");
-}
-
-async function AllItemsPage({ sort }: { sort: string }) {
+async function AllItemsPage() {
   const supabase = await createSupabaseRSCClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   // データ取得: 未購入の全てのアイテム（月別 + Saved）
-  let query = supabase
+  // 並び替えはフィルター機能で行うため、サーバー側ではデフォルト（新着順）のみ
+  const { data: items } = await supabase
     .from("wishlist")
     .select("*")
     .eq("user_id", user.id)
     .eq("is_purchased", false)
-    .or("deleted.is.null,deleted.eq.false");
-
-  // 並び替え
-  switch (sort) {
-    case "created-desc":
-    case "created":
-      query = query.order("created_at", { ascending: false });
-      break;
-    case "priority-desc":
-      query = query.order("priority", { ascending: false });
-      break;
-    case "priority-asc":
-      query = query.order("priority", { ascending: true });
-      break;
-    case "price-desc":
-      query = query.order("price", { ascending: false, nullsFirst: true as any });
-      break;
-    case "price-asc":
-      query = query.order("price", { ascending: true, nullsFirst: true as any });
-      break;
-    case "deadline-asc":
-      query = query.order("deadline", { ascending: true, nullsFirst: true as any });
-      break;
-    case "deadline-desc":
-      query = query.order("deadline", { ascending: false, nullsFirst: true as any });
-      break;
-    default:
-      query = query.order("created_at", { ascending: false });
-  }
-
-  const { data: items } = await query;
+    .or("deleted.is.null,deleted.eq.false")
+    .order("created_at", { ascending: false });
 
   return <AllItemsClient initialItems={items || []} />;
 }
@@ -105,7 +63,6 @@ export default async function Home({
   }
 
   const month = params.month as string | undefined;
-  const sort = (params.sort as string | undefined) || "created-desc";
 
   if (month) {
     console.log('[HomePage Server] Month is specified:', month);
@@ -140,7 +97,7 @@ export default async function Home({
           <p className="text-sm text-gray-500">読み込み中...</p>
         </div>
       }>
-        <AllItemsPage sort={sort} />
+        <AllItemsPage />
       </Suspense>
     </>
   );
