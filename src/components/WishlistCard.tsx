@@ -34,7 +34,8 @@ export function WishlistCard({ item, from }: { item: WishlistItem; from?: string
   const [pending, startTransition] = useTransition();
   const grayscale = item.is_purchased ? "grayscale" : "";
   const deadlineLabel = item.is_someday ? "未定" : (item.deadline ?? "-");
-  const showUnpurchaseButton = from === "purchased" && item.is_purchased;
+  // 購入済みページではボタンを表示しない（編集画面で更新可能なため）
+  const showUnpurchaseButton = false;
 
   const handleCardClick = () => {
     const url = from ? `/item/${item.id}?from=${encodeURIComponent(from)}` : `/item/${item.id}`;
