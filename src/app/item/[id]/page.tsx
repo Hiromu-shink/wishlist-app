@@ -65,18 +65,19 @@ export default function ItemDetailPage() {
     
     const items: Array<{ label: string; href?: string }> = [{ label: 'Home', href: '/' }];
     
-    if (from === 'someday') {
+    if (from === 'purchased') {
+      items.push({ label: '購入済み', href: '/purchased' });
+    } else if (from === 'trash') {
+      items.push({ label: '削除済み', href: '/trash' });
+    } else if (from === 'saved' || from === 'someday') {
       items.push({ label: 'Saved', href: '/someday' });
-    } else if (from) {
+    } else if (from && from.match(/^\d{4}-\d{2}$/)) {
       // 月別ページ（例: 2025-11）
       try {
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const date = new Date(`${from}-01`);
         if (!isNaN(date.getTime())) {
-          const monthName = monthNames[date.getMonth()];
-          const year = date.getFullYear();
-          const monthLabel = `${monthName} ${year}`;
-          items.push({ label: monthLabel, href: `/?month=${from}` });
+          const monthName = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+          items.push({ label: monthName, href: `/?month=${from}` });
         }
       } catch (e) {
         // 日付の解析に失敗した場合は無視
