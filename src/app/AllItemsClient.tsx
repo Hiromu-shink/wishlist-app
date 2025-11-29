@@ -42,15 +42,14 @@ export function AllItemsClient({ initialItems }: { initialItems: WishlistItem[] 
 
   return (
     <div className="container mx-auto px-4 py-4">
+      <h1 className="text-2xl font-bold mb-2">Wishlist</h1>
+      <p className="text-gray-600 mb-4">Total: {filteredAndSorted.length}</p>
+
+      {/* 月選択とフィルター */}
       <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Wishlist</h1>
-          <p className="text-gray-600">Total: {filteredAndSorted.length}</p>
-        </div>
+        <HomeMonthPicker />
         <FilterMenu preserveParams={[]} />
       </div>
-
-      <HomeMonthPicker />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
         {filteredAndSorted.map((item) => (
