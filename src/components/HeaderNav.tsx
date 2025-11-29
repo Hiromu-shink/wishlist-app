@@ -14,10 +14,6 @@ export function HeaderNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  if (pathname === "/login") {
-    return null;
-  }
-
   useEffect(() => {
     if (!menuOpen) return;
     function handleClickOutside(event: MouseEvent) {
@@ -28,6 +24,10 @@ export function HeaderNav() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
+
+  if (pathname === "/login") {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
