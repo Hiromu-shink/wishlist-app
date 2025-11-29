@@ -16,7 +16,8 @@ function PurchasedContent() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
 
-  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const sortBy = (searchParams.get("sortBy") as any) || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as any) || "desc";
   const deadline = (searchParams.get("deadline") as any) || "all";
   const priceRange = (searchParams.get("priceRange") as any) || "all";
   const priority = (searchParams.get("priority") as any) || "all";
@@ -24,8 +25,8 @@ function PurchasedContent() {
   // フィルターとソートを適用
   const items = useMemo(() => {
     let filtered = filterItems(allItems, { deadline, priceRange, priority });
-    return sortItems(filtered, sort);
-  }, [allItems, sort, deadline, priceRange, priority]);
+    return sortItems(filtered, sortBy, sortOrder);
+  }, [allItems, sortBy, sortOrder, deadline, priceRange, priority]);
 
   useEffect(() => {
     setIsLoading(true);

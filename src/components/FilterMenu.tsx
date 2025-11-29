@@ -4,30 +4,26 @@ import { useState, useRef, useEffect } from "react";
 import { ListFilter, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export type SortOption = 
-  | "created-desc" 
-  | "price-desc" 
-  | "price-asc" 
-  | "priority-desc" 
-  | "deadline-asc";
+export type SortField = "created_at" | "priority" | "price" | "deadline";
+export type SortOrder = "asc" | "desc";
 
 export type DeadlineFilter = "this-month" | "next-month" | "within-3months" | "all";
 export type PriceRangeFilter = "under-10k" | "10k-50k" | "50k-100k" | "over-100k" | "all";
 export type PriorityFilter = "5" | "4+" | "3+" | "all";
 
 export interface FilterState {
-  sort: SortOption;
+  sortBy: SortField;
+  sortOrder: SortOrder;
   deadline: DeadlineFilter;
   priceRange: PriceRangeFilter;
   priority: PriorityFilter;
 }
 
-const sortOptions: Array<{ value: SortOption; label: string }> = [
-  { value: "created-desc", label: "新着順" },
-  { value: "price-desc", label: "価格が高い順" },
-  { value: "price-asc", label: "価格が低い順" },
-  { value: "priority-desc", label: "優先度が高い順" },
-  { value: "deadline-asc", label: "期限が近い順" },
+const sortFields: Array<{ field: SortField; label: string }> = [
+  { field: "created_at", label: "新着順" },
+  { field: "priority", label: "優先度" },
+  { field: "price", label: "価格" },
+  { field: "deadline", label: "期限" },
 ];
 
 const deadlineOptions: Array<{ value: DeadlineFilter; label: string }> = [
@@ -53,8 +49,11 @@ const priorityOptions: Array<{ value: PriorityFilter; label: string }> = [
 ];
 
 function parseFilterState(searchParams: URLSearchParams): FilterState {
+  const sortBy = (searchParams.get("sortBy") as SortField) || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as SortOrder) || "desc";
   return {
-    sort: (searchParams.get("sort") as SortOption) || "created-desc",
+    sortBy,
+    sortOrder,
     deadline: (searchParams.get("deadline") as DeadlineFilter) || "all",
     priceRange: (searchParams.get("priceRange") as PriceRangeFilter) || "all",
     priority: (searchParams.get("priority") as PriorityFilter) || "all",
@@ -93,6 +92,23 @@ export function FilterMenu({ currentPath, preserveParams = [] }: FilterMenuProps
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  function handleSort(field: SortField) {
+    let newSortBy: SortField;
+    let newSortOrder: SortOrder;
+    
+    if (filterState.sortBy === field) {
+      // 同じフィールド → 昇順/降順を切り替え
+      newSortBy = field;
+      newSortOrder = filterState.sortOrder === "desc" ? "asc" : "desc";
+    } else {
+      // 別のフィールド → 降順に設定
+      newSortBy = field;
+      newSortOrder = "desc";
+    }
+    
+    applyFilters({ sortBy: newSortBy, sortOrder: newSortOrder });
+  }
+
   function applyFilters(newState: Partial<FilterState>) {
     const updated = { ...filterState, ...newState };
     setFilterState(updated);
@@ -106,7 +122,10 @@ export function FilterMenu({ currentPath, preserveParams = [] }: FilterMenuProps
     });
     
     // フィルターパラメータを追加
-    if (updated.sort !== "created-desc") params.set("sort", updated.sort);
+    if (updated.sortBy !== "created_at" || updated.sortOrder !== "desc") {
+      params.set("sortBy", updated.sortBy);
+      params.set("sortOrder", updated.sortOrder);
+    }
     if (updated.deadline !== "all") params.set("deadline", updated.deadline);
     if (updated.priceRange !== "all") params.set("priceRange", updated.priceRange);
     if (updated.priority !== "all") params.set("priority", updated.priority);
@@ -165,20 +184,24 @@ export function FilterMenu({ currentPath, preserveParams = [] }: FilterMenuProps
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">並び替え</label>
               <div className="space-y-1">
-                {sortOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => applyFilters({ sort: option.value })}
-                    className={`block w-full px-3 py-2 text-left text-sm rounded ${
-                      filterState.sort === option.value
-                        ? "bg-gray-100 font-semibold text-gray-900"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                {sortFields.map(({ field, label }) => {
+                  const isSelected = filterState.sortBy === field;
+                  const order = isSelected ? filterState.sortOrder : null;
+                  return (
+                    <button
+                      key={field}
+                      type="button"
+                      onClick={() => handleSort(field)}
+                      className={`block w-full px-3 py-2 text-left text-sm rounded ${
+                        isSelected
+                          ? "bg-gray-100 font-semibold text-gray-900"
+                          : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                      }`}
+                    >
+                      {label} {order === "desc" && "▼"} {order === "asc" && "▲"}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

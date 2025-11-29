@@ -30,7 +30,8 @@ function SearchContent() {
   const [pending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
 
-  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const sortBy = (searchParams.get("sortBy") as any) || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as any) || "desc";
   const deadline = (searchParams.get("deadline") as any) || "all";
   const priceRange = (searchParams.get("priceRange") as any) || "all";
   const priority = (searchParams.get("priority") as any) || "all";
@@ -38,8 +39,8 @@ function SearchContent() {
   // フィルターとソートを適用
   const items = useMemo(() => {
     let filtered = filterItems(allItems, { deadline, priceRange, priority });
-    return sortItems(filtered, sort);
-  }, [allItems, sort, deadline, priceRange, priority]);
+    return sortItems(filtered, sortBy, sortOrder);
+  }, [allItems, sortBy, sortOrder, deadline, priceRange, priority]);
 
   // デバウンス処理（500ms待機）
   useEffect(() => {

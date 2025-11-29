@@ -23,7 +23,8 @@ export function HomeClient() {
   const router = useRouter();
   const monthParam = searchParams.get("month");
   const month = monthParam || currentMonth();
-  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const sortBy = (searchParams.get("sortBy") as any) || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as any) || "desc";
   const deadline = (searchParams.get("deadline") as any) || "all";
   const priceRange = (searchParams.get("priceRange") as any) || "all";
   const priority = (searchParams.get("priority") as any) || "all";
@@ -54,8 +55,8 @@ export function HomeClient() {
   // フィルターとソートを適用
   const items = useMemo(() => {
     let filtered = filterItems(allItems, { deadline, priceRange, priority });
-    return sortItems(filtered, sort);
-  }, [allItems, sort, deadline, priceRange, priority]);
+    return sortItems(filtered, sortBy, sortOrder);
+  }, [allItems, sortBy, sortOrder, deadline, priceRange, priority]);
 
   const monthOptions = useMemo(() => {
     const startYear = 2025;
@@ -120,7 +121,7 @@ export function HomeClient() {
         }
         
         console.log('[HomeClient] Fetching wishlist items for month:', month);
-        const res = await fetch(`/api/wishlist?month=${encodeURIComponent(month)}&sort=${encodeURIComponent(sort)}`, { cache: "no-store" });
+        const res = await fetch(`/api/wishlist?month=${encodeURIComponent(month)}`, { cache: "no-store" });
         if (res.status === 401) {
           console.log('[HomeClient] 401 Unauthorized, redirecting to login');
           router.push("/login?redirect_to=" + encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/"));

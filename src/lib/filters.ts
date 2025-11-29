@@ -85,43 +85,44 @@ export function filterItems(
   return filtered;
 }
 
+import type { SortField, SortOrder } from "@/components/FilterMenu";
+
 export function sortItems(
   items: WishlistItem[],
-  sort: "created-desc" | "price-desc" | "price-asc" | "priority-desc" | "deadline-asc"
+  sortBy: SortField,
+  sortOrder: SortOrder
 ): WishlistItem[] {
   const sorted = [...items];
+  const ascending = sortOrder === "asc";
   
-  switch (sort) {
-    case "created-desc":
+  switch (sortBy) {
+    case "created_at":
       return sorted.sort((a, b) => {
         const aTime = new Date(a.created_at).getTime();
         const bTime = new Date(b.created_at).getTime();
-        return bTime - aTime;
+        return ascending ? aTime - bTime : bTime - aTime;
       });
     
-    case "price-desc":
+    case "price":
       return sorted.sort((a, b) => {
-        const aPrice = a.price ?? 0;
-        const bPrice = b.price ?? 0;
-        return bPrice - aPrice;
+        const aPrice = a.price ?? (ascending ? Infinity : 0);
+        const bPrice = b.price ?? (ascending ? Infinity : 0);
+        return ascending ? aPrice - bPrice : bPrice - aPrice;
       });
     
-    case "price-asc":
+    case "priority":
       return sorted.sort((a, b) => {
-        const aPrice = a.price ?? Infinity;
-        const bPrice = b.price ?? Infinity;
-        return aPrice - bPrice;
+        return ascending ? a.priority - b.priority : b.priority - a.priority;
       });
     
-    case "priority-desc":
-      return sorted.sort((a, b) => b.priority - a.priority);
-    
-    case "deadline-asc":
+    case "deadline":
       return sorted.sort((a, b) => {
         if (!a.deadline && !b.deadline) return 0;
-        if (!a.deadline) return 1;
-        if (!b.deadline) return -1;
-        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+        if (!a.deadline) return ascending ? -1 : 1;
+        if (!b.deadline) return ascending ? 1 : -1;
+        const aTime = new Date(a.deadline).getTime();
+        const bTime = new Date(b.deadline).getTime();
+        return ascending ? aTime - bTime : bTime - aTime;
       });
     
     default:

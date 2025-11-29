@@ -23,7 +23,8 @@ function formatDate(value?: string | null) {
 export function AllItemsClient({ initialItems }: { initialItems: WishlistItem[] }) {
   const searchParams = useSearchParams();
   
-  const sort = (searchParams.get("sort") as any) || "created-desc";
+  const sortBy = (searchParams.get("sortBy") as any) || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as any) || "desc";
   const deadline = (searchParams.get("deadline") as any) || "all";
   const priceRange = (searchParams.get("priceRange") as any) || "all";
   const priority = (searchParams.get("priority") as any) || "all";
@@ -35,10 +36,10 @@ export function AllItemsClient({ initialItems }: { initialItems: WishlistItem[] 
     items = filterItems(items, { deadline, priceRange, priority });
     
     // 並び替え適用
-    items = sortItems(items, sort);
+    items = sortItems(items, sortBy, sortOrder);
     
     return items;
-  }, [initialItems, sort, deadline, priceRange, priority]);
+  }, [initialItems, sortBy, sortOrder, deadline, priceRange, priority]);
 
   return (
     <div className="container mx-auto px-4 py-4">
