@@ -20,6 +20,30 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## PWA (Progressive Web App)
+
+このアプリはPWAとして動作します。以下の機能が利用できます：
+
+- **オフライン対応**: Service Workerにより、オフラインでも基本的な機能が利用可能
+- **ホーム画面に追加**: スマートフォンやタブレットのホーム画面に追加可能
+- **スタンドアロンモード**: アプリのように全画面表示
+
+### アイコンの生成
+
+アイコンを再生成する場合：
+
+```bash
+npm run generate-icons
+```
+
+これにより、`public/icon-192.png`と`public/icon-512.png`が生成されます。
+
+### PWAの確認方法
+
+1. 本番ビルドを実行: `npm run build && npm start`
+2. Chrome DevTools → Application → Manifest で確認
+3. 「ホーム画面に追加」が表示されることを確認
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
