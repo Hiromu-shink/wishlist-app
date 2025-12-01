@@ -18,6 +18,8 @@ const withPWA = (() => {
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Turbopackを明示的に有効化（Next.js 16のデフォルト）
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);
