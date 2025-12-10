@@ -37,3 +37,4 @@ convert -size 512x512 xc:black -pointsize 300 -fill white -gravity center -annot
 - PNG形式である必要があります
 - 透明背景も使用可能です
 
+

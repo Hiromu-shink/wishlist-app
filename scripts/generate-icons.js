@@ -23,3 +23,4 @@ console.log('必要なファイル:');
 console.log('- public/icon-192.png (192x192)');
 console.log('- public/icon-512.png (512x512)');
 
+
