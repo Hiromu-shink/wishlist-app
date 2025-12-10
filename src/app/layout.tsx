@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { HeaderNav } from "@/components/HeaderNav";
 import { Suspense } from "react";
+import { NotificationPermission } from "@/components/NotificationPermission";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,9 @@ export default function RootLayout({
         <ToastProvider>
           <Suspense>
             <HeaderNav />
+          </Suspense>
+          <Suspense>
+            <NotificationPermission />
           </Suspense>
           {children}
         </ToastProvider>
