@@ -12,14 +12,14 @@ async function getSession() {
 }
 
 type Props = {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function LoginPage(props: Props) {
   const user = await getSession();
   if (user) redirect("/");
   
-  const searchParams = await (props.searchParams instanceof Promise ? props.searchParams : Promise.resolve(props.searchParams || {}));
+  const searchParams = await (props.searchParams || Promise.resolve({}));
   const error = typeof searchParams.error === "string" ? searchParams.error : null;
   const redirectTo = typeof searchParams.redirect_to === "string" ? searchParams.redirect_to : "/";
   

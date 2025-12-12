@@ -11,10 +11,11 @@ async function getSession() {
   return user;
 }
 
-export default async function SignUpPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+export default async function SignUpPage({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const user = await getSession();
   if (user) redirect("/");
-  const redirectTo = typeof searchParams?.redirect_to === "string" ? searchParams!.redirect_to! : "/";
+  const params = await (searchParams || Promise.resolve({}));
+  const redirectTo = typeof params.redirect_to === "string" ? params.redirect_to : "/";
   return (
     <div className="mx-auto max-w-sm p-6 space-y-4">
       <h1 className="text-xl font-semibold">新規登録</h1>
