@@ -14,7 +14,7 @@ async function getSession() {
 export default async function SignUpPage({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const user = await getSession();
   if (user) redirect("/");
-  const params = await (searchParams || Promise.resolve({}));
+  const params = await (searchParams || Promise.resolve({} as { [key: string]: string | string[] | undefined }));
   const redirectTo = typeof params.redirect_to === "string" ? params.redirect_to : "/";
   return (
     <div className="mx-auto max-w-sm p-6 space-y-4">

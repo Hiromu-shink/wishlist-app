@@ -19,7 +19,7 @@ export default async function LoginPage(props: Props) {
   const user = await getSession();
   if (user) redirect("/");
   
-  const searchParams = await (props.searchParams || Promise.resolve({}));
+  const searchParams = await (props.searchParams || Promise.resolve({} as { [key: string]: string | string[] | undefined }));
   const error = typeof searchParams.error === "string" ? searchParams.error : null;
   const redirectTo = typeof searchParams.redirect_to === "string" ? searchParams.redirect_to : "/";
   
